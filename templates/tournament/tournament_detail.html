@@ -1,0 +1,71 @@
+{% extends "base/base.html" %}
+{% load bootstrap5 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+{% bootstrap_messages %}
+{% block content %}
+    <div class="row">
+        <div class="row">
+            <div class="col-1 mx-2 p-2">
+                <a class="btn btn-primary" href="{% url 'tournaments' %}">Retour</a>
+            </div>
+            <div class="col p-2 mx-2">
+                <h1>Détails du Tournoi: {{ tournament.name }}</h1>
+            </div>
+        </div>
+        <hr>
+        <div class="row d-flex justify-content-center">
+            <p style="width: fit-content">Date: {{ tournament.date }}</p>
+            <p style="width: fit-content">Nombre de sets: {{ tournament.set_number }}</p>
+            <p style="width: fit-content">Type: {{ tournament.get_type_display }}</p>
+        </div>
+        <div class="row d-flex justify-content-around">
+            <div class="col">
+                <h2 class="text-center">Ajouter un joueur</h2>
+                <form class="w-75 mx-auto" method="post">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary">Ajouter</button>
+                    {% endbuttons %}
+                </form>
+            </div>
+
+            <div class="col">
+                <h2 class="text-center">Joueurs inscrits</h2>
+                <ul class="mx-auto">
+                    {% for player in players %}
+                        <div class="mb-2">
+                            <p class="text-center">{{ player.last_name }} {{ player.first_name }} ({{ player.points }}
+                                points)
+                                <a class="btn btn-primary"
+                                   href="{% url 'delete_player_from_tournament' tournament.pk player.pk %}">
+                                    X
+                                </a>
+                            </p>
+                        </div>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="col">
+                <h2 class="text-center">Joueurs disponibles</h2>
+                {% for player in available_players %}
+                    <div class="mb-2">
+                        <p class="text-center">{{ player.last_name }} {{ player.first_name }} ({{ player.points }}
+                            points)
+                            <a class="btn btn-primary"
+                               href="{% url 'add_player_to_tournament' tournament.pk player.pk %}">
+                                Ajouter au tournoi
+                            </a>
+                        </p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
