@@ -1,9 +1,14 @@
 from django.db import models
 
-TYPES = [
+CATEGORIES = [
     ("L", "Loisir"),
     ("J", "Jeunes"),
     ("C", "Compétiteurs")
+]
+
+TOURNAMENT_TYPES = [
+    ("RONDE", 'Rondes'),
+    ("CLASSIC", "Classique")
 ]
 
 
@@ -12,4 +17,6 @@ class Tournament(models.Model):
     date = models.DateField()
     name = models.CharField(max_length=100)
     set_number = models.IntegerField(default=5)
-    type = models.CharField(max_length=100, choices=TYPES, default="C")
+    category = models.CharField(max_length=100, choices=CATEGORIES, default="C")
+    closed = models.BooleanField(default=False)
+    tournament_type = models.CharField(max_length=100, choices=TOURNAMENT_TYPES, default="CLASSIC")

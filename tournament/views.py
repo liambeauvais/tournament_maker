@@ -3,16 +3,17 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import TemplateView, DetailView
 
 from player.models import Player
-from .models import Tournament, TYPES
+from .models import Tournament, CATEGORIES, TOURNAMENT_TYPES
 
 
 class TournamentForm(forms.ModelForm):
     class Meta:
         model = Tournament
-        fields = ['date', 'name', 'set_number', 'type']
+        fields = ['date', 'name', 'set_number', 'category', 'tournament_type']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
-            'type': forms.Select(choices=[(k, v) for k, v in TYPES])
+            'category': forms.Select(choices=[(k, v) for k, v in CATEGORIES]),
+            'tournament_type': forms.Select(choices=[(k, v) for k, v in TOURNAMENT_TYPES])
         }
 
 
@@ -53,7 +54,7 @@ class TournamentDetailView(DetailView):
     context_object_name = 'tournament'
 
     def get_available_players(self):
-            if self.object.type == "C":
+            if self.object.category == "C":
                 return Player.objects.exclude(tournaments=self.object).exclude(points=0)
             else:
                 return Player.objects.exclude(tournaments=self.object)
@@ -68,8 +69,8 @@ class TournamentDetailView(DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        print(self.object.type)
-        if self.object.type == "C":
+        print(self.object.category)
+        if self.object.category == "C":
             form = PlayerForm(request.POST)
         else:
             form = CasuPlayerForm(request.POST)
@@ -92,6 +93,7 @@ def delete_player_from_tournament(request, *args, **kwargs):
     player = get_object_or_404(Player, id=kwargs.get("player_id"))
     tournament.players.remove(player)
     return redirect('tournament_detail', pk=tournament.pk)
+
 
 
 
