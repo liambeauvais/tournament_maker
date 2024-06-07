@@ -1,86 +1,10 @@
-from django.shortcuts import get_object_or_404
+from django.forms import forms
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import TemplateView
 
-from game.models import Game
-from game_set.models import Set
-from player.models import Player
-from pool.models import Pool
+from step.functions.step_generation import generate_pools
 from step.models import Step, StepPLayer
 from tournament.models import Tournament
-
-
-def generate_round_robin_games(players: list[Player]):
-    num_players = len(players)
-    mock_player = Player.objects.get(last_name="Test")
-    if num_players % 2 != 0:
-        players.append(mock_player)
-        num_players += 1
-    # Fix the first player
-    fixed_player = players[0]
-    rotating_players = players[1:]
-
-    games: list[Game] = []
-
-    for round_num in range(num_players - 1):
-        # Add matches for the current round
-        games.append(
-            Game(
-                player_one_id=fixed_player.pk,
-                player_two_id=rotating_players[-1].pk
-            )
-        )
-        for i in range((num_players - 1) // 2):
-            games.append(
-                Game(
-                    player_one_id=rotating_players[i].pk,
-                    player_two_id=rotating_players[-2 - i].pk
-                )
-            )
-
-        # Rotate players for the next round
-        rotating_players = [rotating_players[-1]] + rotating_players[:-1]
-    for game in games:
-        if game.player_one.pk == mock_player.pk or game.player_two.pk == mock_player.pk:
-            del game
-    return games
-
-
-# Create your views here.
-
-def generate_pool_matches(pools: list[Pool]):
-    number_of_sets = pools[0].step.tournament.set_number
-    for pool in pools:
-        games = generate_round_robin_games(pool.players.all())
-        games = Game.objects.bulk_create(
-            games
-        )
-        for game in games:
-            pool.games.add(game)
-            pool.save()
-
-            for i in range(number_of_sets):
-                set = Set.objects.create(
-                    game_id=game.pk,
-                    number=i + 1
-                )
-                set.save()
-
-
-def generate_pools(numbers_of_pools: int, players: list[Player], step_id: int, players_by_pool: int):
-    pools = []
-    for i in range(numbers_of_pools):
-        pool = Pool.objects.create(
-            step_id=step_id
-        )
-        pool.save()
-        pools.append(pool)
-    for i in range(players_by_pool):
-        for pool in pools:
-            if len(players) > 0:
-                pool.players.add(players.pop(0))
-                pool.save()
-        pools = pools.reverse()
-
-    generate_pool_matches(pools)
 
 
 def create_first_step(request, *args, **kwargs):
@@ -100,9 +24,19 @@ def create_first_step(request, *args, **kwargs):
             ) for player in players
         )
 
-        numbers_of_pools = (len(players) // 3 +
-                            (3 - (len(players) % 3)) if len(players) % 3 != 0
-                            else 0
-                            )
+        numbers_of_pools = len(players) // 3 + (1 if len(players) % 3 != 0 else 0)
 
         generate_pools(numbers_of_pools, players, step.pk, 3)
+    return redirect('steps', pk=tournament.pk)
+
+
+class StepView(TemplateView):
+    template_name = "step/step_view.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
+        context['first_step'] = first_step
+        context['second_steps'] = first_step.step_set
+        context['number_of_sets'] = [i + 1 for i in range(first_step.tournament.set_number)]
+        return context

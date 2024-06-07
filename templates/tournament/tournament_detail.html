@@ -13,9 +13,18 @@
             <div class="col-1 mx-2 p-2">
                 <a class="btn btn-primary" href="{% url 'tournaments' %}">Retour</a>
             </div>
-            <div class="col p-2 mx-2">
+            <div class="col-6 p-2 mx-2">
                 <h1>Détails du Tournoi: {{ tournament.name }}</h1>
             </div>
+            {% if tournament.step_set %}
+            <div class="col-2 p-2 mx-2">
+            {% if tournament.step_set|length == 0 %}
+                <a class="btn btn-primary" href="{% url 'create_first_step' tournament.pk %}">Clôturer les inscriptions</a>
+            {% else %}
+                <a class="btn btn-primary" href="{% url 'steps' tournament.pk %}">Accéder aux poules</a>
+            {% endif %}
+                </div>
+            {% endif %}
         </div>
         <hr>
         <div class="row d-flex justify-content-center">

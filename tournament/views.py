@@ -69,7 +69,7 @@ class TournamentDetailView(DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        print(self.object.category)
+
         if self.object.category == "C":
             form = PlayerForm(request.POST)
         else:

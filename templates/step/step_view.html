@@ -9,4 +9,71 @@
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% bootstrap_messages %}
 {% block content %}
+    <div class="row">
+        <div class="col-10">
+            <p class="fs-1">Premières poules</p>
+        </div>
+        <div class="col-2 d-flex justify-content-center align-items-center">
+            <a class="btn btn-primary">Passer aux deuxièmes poules</a>
+        </div>
+    </div>
+    <div class="row d-flex justify-content-around p-2">
+        {% for pool in first_step.pool_set.all %}
+            <div class="card mx-2" style="min-width:600px; max-width: 600px">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-9">
+                            <p class="fs-3">Poule {{ forloop.counter }}</p>
+                        </div>
+                        <div class="col-3">
+                            <a class="btn btn-primary" style="font-size: 0.8em">Valider la poule</a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        {% for player in pool.players.all %}
+                            <p>Joueur {{ forloop.counter }}: {{ player.last_name }} {{ player.first_name }}
+                                ({{ player.points }} points)</p>
+                        {% endfor %}
+                    </div>
+                    <table class="table" style="font-size: 0.7em">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Joueur 1</th>
+                            <th scope="col">Joueur 2</th>
+                            <th scope="col">Sets</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for game in pool.games.all %}
+                            <tr>
+                                <th scope="col">{{ forloop.counter }}</th>
+                                <td>{{ game.player_one.last_name }} {{ game.player_one.first_name }}</td>
+                                <td>{{ game.player_two.last_name }} {{ game.player_two.first_name }}</td>
+                                <td>
+                                    <div class="row d-flex justify-content-between">
+                                        <form method="post" action="{% url "update_game" game.pk %}"
+                                              class="col d-flex justify-content-start" style="width: 300px">
+                                            {% csrf_token %}
+                                            {% for set in game.sets.all %}
+                                                <div class="col mx-1" style="min-width: 50px; max-width: 50px">
+                                                    <label class="form-label"
+                                                           for="{{ set.pk }}">Set {{ forloop.counter }}</label>
+                                                    <input class="form-control" id="{{ set.pk }}" type="text"
+                                                           name="{{ set.pk }}"
+                                                           value="{{ set.score|default_if_none:"" }}">
+                                                </div>
+                                            {% endfor %}
+                                            <button class="btn" type="submit" style="width: 40px;height: 40px; padding: 0; font-size: 20px">✔</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}
