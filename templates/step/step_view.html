@@ -26,7 +26,11 @@
                             <p class="fs-3">Poule {{ forloop.counter }}</p>
                         </div>
                         <div class="col-3">
-                            <a class="btn btn-primary" style="font-size: 0.8em">Valider la poule</a>
+                            {% if pool.is_done %}
+                                <a class="btn btn-primary" style="font-size: 0.8em">Valider la poule</a>
+                            {% else %}
+                                <a class="btn btn-primary disabled" style="font-size: 0.8em">Valider la poule</a>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="row">
@@ -64,7 +68,9 @@
                                                            value="{{ set.score|default_if_none:"" }}">
                                                 </div>
                                             {% endfor %}
-                                            <button class="btn" type="submit" style="width: 40px;height: 40px; padding: 0; font-size: 20px">✔</button>
+                                            <button class="btn" type="submit"
+                                                    style="width: 40px;height: 40px; padding: 0; font-size: 20px">✔
+                                            </button>
                                         </form>
                                     </div>
                                 </td>

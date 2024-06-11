@@ -18,7 +18,7 @@
             </div>
             {% if tournament.step_set %}
             <div class="col-2 p-2 mx-2">
-            {% if tournament.step_set|length == 0 %}
+            {% if tournament.step_set.all|length == 0 %}
                 <a class="btn btn-primary" href="{% url 'create_first_step' tournament.pk %}">Clôturer les inscriptions</a>
             {% else %}
                 <a class="btn btn-primary" href="{% url 'steps' tournament.pk %}">Accéder aux poules</a>
@@ -30,7 +30,8 @@
         <div class="row d-flex justify-content-center">
             <p style="width: fit-content">Date: {{ tournament.date }}</p>
             <p style="width: fit-content">Nombre de sets: {{ tournament.set_number }}</p>
-            <p style="width: fit-content">Type: {{ tournament.get_type_display }}</p>
+            <p style="width: fit-content">Catégorie: {{ tournament.get_category_display }}</p>
+            <p style="width: fit-content">type: {{ tournament.get_tournament_type_display }}</p>
         </div>
         <div class="row d-flex justify-content-around">
             <div class="col">
