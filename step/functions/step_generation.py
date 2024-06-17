@@ -46,6 +46,11 @@ def generate_round_robin_games(players: QuerySet[Player], tournament_id: Type[in
     for game in games:
         if game.player_one.pk != mock_player.pk and game.player_two.pk != mock_player.pk:
             games_without_mock.append(game)
+
+    if len(games_without_mock) == 3:
+        first_game = games_without_mock.pop(0)
+        games_without_mock.append(first_game)
+
     return games_without_mock
 
 
