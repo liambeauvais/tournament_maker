@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView
 
+from pool.models import Pool
+from step.functions.scoreboard import create_or_update_scoreboard
 from step.functions.step_generation import generate_pools
 from step.models import Step, StepPLayer
 from tournament.models import Tournament
@@ -35,7 +37,14 @@ class StepView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
-        context['first_step'] = first_step
-        context['second_steps'] = first_step.step_set
+        context['step'] = first_step
         context['number_of_sets'] = [i + 1 for i in range(first_step.tournament.set_number)]
         return context
+
+
+def validate_pool(request, *args, **kwargs):
+    pool = Pool.objects.get(pk=kwargs.get("pool_pk"))
+    pool.validated = True
+    pool.save()
+    create_or_update_scoreboard(pool)
+    return redirect('steps', pk=pool.step.tournament.pk)
