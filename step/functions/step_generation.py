@@ -50,9 +50,12 @@ def generate_round_robin_games(players: QuerySet[PoolPLayer], tournament_id: Typ
         if game.player_one.pk != mock_player.pk and game.player_two.pk != mock_player.pk:
             games_without_mock.append(game)
 
+
     if len(games_without_mock) == 3:
         first_game = games_without_mock.pop(0)
         games_without_mock.append(first_game)
+        second_game = games_without_mock.pop(1)
+        games_without_mock.insert(0, second_game)
 
     return games_without_mock
 

@@ -1,0 +1,5 @@
+# Les matchs ne sont pas toujours dans le bon ordre dans le bon ordre
+# Faire en sorte que, par exemple, la rencontre soit joueur2-joueur3, et non joueur3-joueur2
+# Mieux styliser les second_steps
+# Faire le tableau final
+# tester avec poules de 4 en second_steps

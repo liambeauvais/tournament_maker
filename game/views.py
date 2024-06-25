@@ -16,8 +16,6 @@ def value_is_digit(value):
 
 
 def update_game(request, *args, **kwargs):
-    game = Game.objects.get(pk=kwargs['pk'])
-
     for key, value in request.POST.items():
         if key == "csrfmiddlewaretoken":
             continue
@@ -29,4 +27,4 @@ def update_game(request, *args, **kwargs):
         else:
             game_set.score = int(value)
             game_set.save()
-    return redirect('steps', game.tournament.pk)
+    return redirect(request.META.get('HTTP_REFERER'))
