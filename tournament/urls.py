@@ -1,6 +1,6 @@
 from django.urls import path
 
-from step.views import create_first_step, StepView
+from step.views import create_first_step, StepView, SecondStepsView
 from tournament.views import TournamentView, TournamentDetailView, add_player_to_tournament, \
     delete_player_from_tournament
 
@@ -12,4 +12,6 @@ urlpatterns = [
          name='delete_player_from_tournament'),
     path('<int:pk>/create_first_step/', create_first_step, name='create_first_step'),
     path('<int:pk>/steps/', StepView.as_view(), name='steps'),
+    path('<int:pk>/second_steps/', SecondStepsView.as_view(), name='second_steps'),
+
 ]

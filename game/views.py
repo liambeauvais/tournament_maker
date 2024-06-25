@@ -17,11 +17,16 @@ def value_is_digit(value):
 
 def update_game(request, *args, **kwargs):
     game = Game.objects.get(pk=kwargs['pk'])
-    print(request.POST)
+
     for key, value in request.POST.items():
-        if key == "csrfmiddlewaretoken" or not value_is_digit(value):
+        if key == "csrfmiddlewaretoken":
             continue
+
         game_set = Set.objects.get(pk=key)
-        game_set.score = int(value)
-        game_set.save()
+        if not value_is_digit(value):
+            game_set.score = None
+            game_set.save()
+        else:
+            game_set.score = int(value)
+            game_set.save()
     return redirect('steps', game.tournament.pk)

@@ -5,16 +5,19 @@ from django.db.models import QuerySet
 from game.models import Game
 from game_set.models import Set
 from player.models import Player
-from pool.models import Pool
+from pool.models import Pool, PoolPLayer
 
 
-def generate_round_robin_games(players: QuerySet[Player], tournament_id: Type[int]):
+def generate_round_robin_games(players: QuerySet[PoolPLayer], tournament_id: Type[int]):
     num_players = len(players)
     mock_player = Player.objects.get(last_name="Test")
-    players_id = [player.pk for player in players] + [mock_player.pk]
+
+    players_id = [player.player_id for player in players]
     if num_players % 2 != 0:
-        players = Player.objects.filter(pk__in=players_id)
-        num_players = len(players)
+        players_id.append(mock_player.pk)
+        num_players += 1
+
+    players = Player.objects.filter(pk__in=players_id).order_by("points").all()
     # Fix the first player
     fixed_player = players[0]
     rotating_players = players[1:]
@@ -26,7 +29,7 @@ def generate_round_robin_games(players: QuerySet[Player], tournament_id: Type[in
         games.append(
             Game(
                 player_one_id=fixed_player.pk,
-                player_two_id=rotating_players[-1].pk,
+                player_two_id=rotating_players[len(rotating_players)-1].pk,
                 tournament_id=tournament_id
             )
         )
@@ -34,13 +37,13 @@ def generate_round_robin_games(players: QuerySet[Player], tournament_id: Type[in
             games.append(
                 Game(
                     player_one_id=rotating_players[i].pk,
-                    player_two_id=rotating_players[-2 - i].pk,
+                    player_two_id=rotating_players[len(rotating_players) -2 - i].pk,
                     tournament_id=tournament_id
                 )
             )
 
         # Rotate players for the next round
-        rotating_players = [rotating_players[-1]] + rotating_players[:-1]
+        rotating_players = [rotating_players[len(rotating_players)-1]] + rotating_players[:len(rotating_players)-1]
 
     games_without_mock = []
     for game in games:
@@ -73,7 +76,7 @@ def generate_pool_matches(pools: list[Pool]):
                 set.save()
 
 
-def generate_pools(numbers_of_pools: int, players: list[Player], step_id: int, players_by_pool: int):
+def generate_pools(numbers_of_pools: int, players: list[Player], step_id: int, players_by_pool: int = None):
     for i in range(numbers_of_pools):
         pool = Pool.objects.create(
             step_id=step_id
@@ -81,12 +84,16 @@ def generate_pools(numbers_of_pools: int, players: list[Player], step_id: int, p
         pool.save()
     pools = Pool.objects.filter(step_id=step_id).all()
     count = 0
+
     for i in range(players_by_pool):
         for pool in pools:
             if len(players) > count:
-                pool.players.add(players[count])
-                pool.save()
+                pool_player = PoolPLayer.objects.create(
+                    pool_id=pool.pk,
+                    player_id=players[count].pk
+                )
+                pool_player.save()
                 count += 1
-        pools = pools.reverse()
+        pools = pools[::-1]
 
     generate_pool_matches(pools)

@@ -8,12 +8,11 @@ from tournament.models import Tournament
 class Step(models.Model):
     last_step = models.ForeignKey('self', on_delete=models.CASCADE, null=True)
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
+    players = models.ManyToManyField(Player, related_name="steps")
+    rank = models.IntegerField(default=0)
 
     def is_done(self):
-        return all(pool.validated for pool in self.pool_set.all())
+        return all(pool.validated for pool in self.pools.all())
 
 
-class StepPLayer(models.Model):
-    player = models.ForeignKey(Player, on_delete=models.CASCADE, related_name="steps")
-    step = models.ForeignKey(Step, on_delete=models.CASCADE, related_name="players")
-    rank = models.IntegerField(default=0)
+

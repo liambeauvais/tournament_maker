@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     "game_set.apps.GameSetConfig",
     "step.apps.StepConfig",
     "pool.apps.PoolConfig",
-    "bootstrap5"
+    "bootstrap5",
 ]
 
 MIDDLEWARE = [

@@ -1,34 +1,55 @@
+import math
+
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView
 
-from pool.models import Pool
-from step.functions.scoreboard import create_or_update_scoreboard
+from pool.models import Pool, PoolPLayer
+from step.functions.scoreboard import create_pool_scoreboard
 from step.functions.step_generation import generate_pools
-from step.models import Step, StepPLayer
+from step.models import Step
 from tournament.models import Tournament
 
 
 def create_first_step(request, *args, **kwargs):
     tournament = get_object_or_404(Tournament, id=kwargs.get('pk'))
     if tournament.step_set.count() == 0:
-        players = tournament.players.order_by('points').all()
+        players = tournament.players.order_by('-points').all()
         step = Step.objects.create(
             last_step=None,
             tournament_id=tournament.pk,
         )
         step.save()
-        StepPLayer.objects.bulk_create(
-            StepPLayer(
-                step_id=step.pk,
-                player_id=player.pk,
-                rank=0
-            ) for player in players
-        )
+        for player in players:
+            step.players.add(player)
+        step.save()
 
         numbers_of_pools = len(players) // 3 + (1 if len(players) % 3 != 0 else 0)
 
         generate_pools(numbers_of_pools, players, step.pk, 3)
     return redirect('steps', pk=tournament.pk)
+
+
+def create_second_step(request, *args, **kwargs):
+    first_step = get_object_or_404(Step, id=kwargs.get('pk'))
+    ranks = {
+        "1": [],
+        "2": [],
+        "3": []
+    }
+    for pool in first_step.pools.all():
+        for pool_player in pool.players.all():
+            ranks[str(pool_player.rank)].append(pool_player.player)
+
+    for rank, players in ranks.items():
+        step = Step.objects.create(
+            last_step=first_step,
+            tournament_id=first_step.tournament.pk,
+            rank=int(rank)
+        )
+        step.save()
+        generate_pools(2, players, step.pk, math.ceil(float(len(players) / 2)))
+
+    return redirect('second_steps', pk=first_step.tournament.pk)
 
 
 class StepView(TemplateView):
@@ -42,9 +63,29 @@ class StepView(TemplateView):
         return context
 
 
+class SecondStepsView(TemplateView):
+    template_name = "step/second_steps.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
+        second_steps = first_step.step_set.all()
+        context["steps"] = second_steps
+        context['number_of_sets'] = [i + 1 for i in range(first_step.tournament.set_number)]
+        return context
+
+
 def validate_pool(request, *args, **kwargs):
     pool = Pool.objects.get(pk=kwargs.get("pool_pk"))
     pool.validated = True
     pool.save()
-    create_or_update_scoreboard(pool)
+    coeffs = create_pool_scoreboard(pool)
+    sorted_coeffs = sorted(coeffs, key=lambda x: x['coeff'], reverse=True)
+    count = 1
+    for coef in sorted_coeffs:
+        step_player = PoolPLayer.objects.get(player_id=coef['player_pk'], pool_id=pool.pk)
+        step_player.rank = count
+        step_player.coeff = coef['coeff']
+        step_player.save()
+        count += 1
     return redirect('steps', pk=pool.step.tournament.pk)
