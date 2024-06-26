@@ -7,7 +7,7 @@
 {% bootstrap_javascript %}
 
 {# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
+
 {% block content %}
     <div class="p-2">
         <div class="row">
@@ -16,7 +16,7 @@
             </div>
             <div class="col-2 d-flex justify-content-center align-items-center">
                 {% if step.is_done %}
-                    {% if step.step_set|length == 0 %}
+                    {% if step.step_set.all|length == 0 %}
                         <a class="btn btn-primary" href="{% url 'create_second_step' step.pk %}">Créer les deuxièmes
                             poules</a>
                     {% else %}

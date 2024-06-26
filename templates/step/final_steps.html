@@ -1,0 +1,82 @@
+{% extends "base/base.html" %}
+{% load bootstrap5 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+
+{% block content %}
+    {% for step in steps %}
+        <div class="gap-1">
+            <h2>Finale des rangs {{ forloop.counter }}</h2>
+            {% for child_step in step.step_set.all %}
+                {% for pool in child_step.pools.all %}
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <h3>Rencontre</h3>
+                            </div>
+                            <div class="row">
+                                {% for player in pool.players.all %}
+                                    <div class="row">
+                                        <div class="col-8">
+                                            Joueur {{ forloop.counter }}: {{ player.player.last_name }} {{ player.player.first_name }}
+                                            ({{ player.player.points }} points)
+                                        </div>
+                                        {% if pool.validated %}
+                                            <div class="col-4">
+                                                Rang: {{ player.rank }}, coeff: {{ player.coeff }}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <table class="table table-striped" style="font-size: 0.7em">
+                                <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th style="width: 100px" scope="col">Joueur 1</th>
+                                    <th style="width: 100px" scope="col">Joueur 2</th>
+                                    <th scope="col">Sets</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for game in pool.games.all %}
+                                    <tr>
+                                        <th scope="col">{{ forloop.counter }}</th>
+                                        <td>{{ game.player_one.last_name }} {{ game.player_one.first_name }}</td>
+                                        <td>{{ game.player_two.last_name }} {{ game.player_two.first_name }}</td>
+                                        <td>
+                                            <div class="row d-flex justify-content-between">
+                                                <form method="post" action="{% url "update_game" game.pk %}"
+                                                      class="col d-flex justify-content-start" style="width: 300px">
+                                                    {% csrf_token %}
+                                                    {% for set in game.sets.all %}
+                                                        <div class="col mx-1" style="min-width: 50px; max-width: 50px">
+                                                            <label class="form-label"
+                                                                   for="{{ set.pk }}">Set {{ forloop.counter }}</label>
+                                                            <input class="form-control" id="{{ set.pk }}" type="text"
+                                                                   name="{{ set.pk }}"
+                                                                   value="{{ set.score|default_if_none:"" }}">
+                                                        </div>
+                                                    {% endfor %}
+                                                    <button class="btn" type="submit"
+                                                            style="width: 40px;height: 40px; padding: 0; font-size: 20px">
+                                                        ✔
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endfor %}
+{% endblock %}

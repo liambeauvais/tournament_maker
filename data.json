@@ -1,0 +1,11 @@
+[
+  {
+    "model": "player.player",
+    "pk": 1,
+    "fields": {
+      "first_name": "Test",
+      "last_name": "Test",
+      "points": 0
+    }
+  }
+]

@@ -52,6 +52,30 @@ def create_second_step(request, *args, **kwargs):
     return redirect('second_steps', pk=first_step.tournament.pk)
 
 
+def create_final_steps(request, *args, **kwargs):
+    first_step = get_object_or_404(Step, id=kwargs.get('pk'))
+    second_steps = first_step.step_set.all()
+    for second_step in second_steps:
+        ranks = {
+        }
+        for pool in second_step.pools.all():
+            for pool_player in pool.players.all():
+                if pool_player.rank in ranks:
+                    ranks[pool_player.rank].append(pool_player.player)
+                else:
+                    ranks[pool_player.rank] = [pool_player.player]
+        print(ranks)
+        for rank, players in ranks.items():
+            step = Step.objects.create(
+                last_step=second_step,
+                tournament_id=first_step.tournament.pk,
+                rank=int(rank)
+            )
+            step.save()
+            generate_pools(1, players, step.pk, 2)
+    return redirect('final_steps', pk=first_step.tournament.pk)
+
+
 class StepView(TemplateView):
     template_name = "step/step_view.html"
 
@@ -71,6 +95,23 @@ class SecondStepsView(TemplateView):
         first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
         second_steps = first_step.step_set.all()
         context["steps"] = second_steps
+        context["firs_step"] = first_step
+        context['number_of_sets'] = [i + 1 for i in range(first_step.tournament.set_number)]
+        context['steps_are_done'] = all(step.is_done() for step in first_step.step_set.all())
+        context['not_created'] = all(step.step_set.count() == 0 for step in first_step.step_set.all())
+        return context
+
+
+class FinalStepsView(TemplateView):
+    template_name = 'step/final_steps.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        first_step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
+        second_steps = first_step.step_set.all()
+        context["steps"] = second_steps
+        for second_step in second_steps:
+            print(second_step.step_set.all())
         context['number_of_sets'] = [i + 1 for i in range(first_step.tournament.set_number)]
         return context
 
@@ -88,4 +129,5 @@ def validate_pool(request, *args, **kwargs):
         step_player.coeff = coef['coeff']
         step_player.save()
         count += 1
-    return redirect('steps', pk=pool.step.tournament.pk)
+    # return redirect('steps', pk=pool.step.tournament.pk)
+    return redirect(request.META.get('HTTP_REFERER'))

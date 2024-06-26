@@ -6,15 +6,21 @@
 {% bootstrap_javascript %}
 
 {# Display django.contrib.messages as Bootstrap alerts #}
-{% bootstrap_messages %}
+
 {% block content %}
     <div class="row">
         <div class="col-10">
             <p class="fs-1">Seconde phase</p>
         </div>
         <div class="col-2 d-flex justify-content-center align-items-center">
-            {% if step.is_done %}
-                <a class="btn btn-primary" href="{% url 'create_second_step' step.pk %}">Passer au tableau final</a>
+            {% if steps_are_done %}
+                {% if not_created %}
+                    <a class="btn btn-primary" href="{% url 'create_final_steps' firs_step.pk %}">Créer le tableau
+                        final</a>
+                {% else %}
+                    <a class="btn btn-primary" href="{% url 'final_steps' firs_step.tournament.pk %}">Accéder au tableau
+                        final</a>
+                {% endif %}
             {% else %}
                 <a class="btn btn-primary disabled">Passer au tableau final</a>
             {% endif %}
@@ -23,7 +29,7 @@
     {% for step in steps %}
         <hr>
         <div>
-        Poules des rangs {{ step.rank }}
+            Poules des rangs {{ step.rank }}
         </div>
         <div class="row d-flex justify-content-around gap-3">
             {% for pool in step.pools.all %}
