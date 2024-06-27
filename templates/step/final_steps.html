@@ -7,13 +7,13 @@
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% block content %}
-    
+
     <div class="row p-2">
             {% for step in steps %}
                 <div class="gap-1">
                     <h2>Finale des rangs {{ forloop.counter }}</h2>
                     <div class="row d-flex justify-content-around gap-2">
-                        {% for child_step in step.step_set.all %}
+                        {% for child_step in step.step_set.all|dictsort:"rank" %}
                             {% for pool in child_step.pools.all %}
                                 <div class="card col-5">
                                     <div class="card-body">
