@@ -1,0 +1,21 @@
+{% extends "base/base.html" %}
+{% load bootstrap5 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+
+{% block content %}
+    <div class="row">
+        <div class="row">
+            <p class="fs-1">Récapitulatif du tournoi</p>
+        </div>
+        <div class="row">
+            {% for player in tournament.scoreboard.scoreboard_players.all %}
+                <p>{{ player.player.first_name }} {{ player.player.last_name }}: {{ player.rank }}</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

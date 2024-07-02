@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "step",
     "pool",
     "bootstrap5",
+    "scoreboard"
 ]
 
 MIDDLEWARE = [

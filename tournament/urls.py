@@ -1,5 +1,6 @@
 from django.urls import path
 
+from scoreboard.views import ScoreBoardView, create_scoreboard
 from step.views import create_first_step, StepView, SecondStepsView, create_final_steps, FinalStepsView, \
     create_second_step
 from tournament.views import TournamentView, TournamentDetailView, add_player_to_tournament, \
@@ -18,4 +19,8 @@ urlpatterns = [
     path('<int:pk>/steps/', StepView.as_view(), name='steps'),
     path('<int:pk>/second_steps/', SecondStepsView.as_view(), name='second_steps'),
     path('<int:pk>/final_steps/', FinalStepsView.as_view(), name='final_steps'),
+
+    path('<int:pk>/create_scoreboard/', create_scoreboard, name='create_scoreboard'),
+    path('<int:pk>/scoreboard/', ScoreBoardView.as_view(), name='scoreboard'),
+
 ]

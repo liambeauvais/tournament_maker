@@ -64,7 +64,7 @@ def create_final_steps(request, *args, **kwargs):
                     ranks[pool_player.rank].append(pool_player.player)
                 else:
                     ranks[pool_player.rank] = [pool_player.player]
-        print(ranks)
+
         for rank, players in ranks.items():
             step = Step.objects.create(
                 last_step=second_step,
@@ -82,6 +82,8 @@ class StepView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
+        context['title'] = f"{first_step.tournament.date}-{first_step.tournament.get_category_display()}"
+
         context['step'] = first_step
         context['number_of_sets'] = [i + 1 for i in range(first_step.tournament.set_number)]
         return context
@@ -93,6 +95,8 @@ class SecondStepsView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
+        context['title'] = f"{first_step.tournament.date}-{first_step.tournament.get_category_display()}"
+
         second_steps = first_step.step_set.all()
         context["steps"] = second_steps
         context["firs_step"] = first_step
@@ -107,8 +111,11 @@ class FinalStepsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        first_step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
+        first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
+        context['title'] = f"{first_step.tournament.date}-{first_step.tournament.get_category_display()}"
+
         second_steps = first_step.step_set.all()
+        context['tournament'] = first_step.tournament
         context["steps"] = second_steps
         context['number_of_sets'] = [i + 1 for i in range(first_step.tournament.set_number)]
         number_of_pools = 0
@@ -116,11 +123,16 @@ class FinalStepsView(TemplateView):
             for final_step in second_step.step_set.all():
                 number_of_pools += final_step.pools.count()
         pool_number_list = []
-        for i in range(1, number_of_pools+1):
-            pool_number_list.append(i*2-1)
-            pool_number_list.append(i*2)
+        for i in range(1, number_of_pools + 1):
+            pool_number_list.append(i * 2 - 1)
+            pool_number_list.append(i * 2)
         context['counter'] = iter(pool_number_list)
-        print(context['counter'])
+
+        context['steps_are_done'] = all(
+            step.is_done()
+            for second_step in first_step.step_set.all()
+            for step in second_step.step_set.all()
+        )
         return context
 
 

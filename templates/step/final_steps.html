@@ -7,88 +7,115 @@
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% block content %}
-
+    <div class="row">
+        <div class="col-10">
+            <p class="fs-1">Phase finale</p>
+        </div>
+        <div class="col-2">
+            {% if steps_are_done %}
+                {% if not tournament.scoreboard %}
+                    <a class="btn btn-primary" href="{% url 'create_scoreboard' tournament.pk %}">Créer le
+                        récapitulatif</a>
+                {% else %}
+                    <a class="btn btn-primary" href="{% url 'scoreboard' tournament.pk %}">Voir le
+                    récapitulatif</a>
+                {% endif %}
+            {% else %}
+                <a class="btn btn-primary disabled">Créer le récapitulatif</a>
+            {% endif %}
+        </div>
+    </div>
     <div class="row p-2">
-            {% for step in steps %}
-                <div class="gap-1">
-                    <h2>Finale des rangs {{ forloop.counter }}</h2>
-                    <div class="row d-flex justify-content-around gap-2">
-                        {% for child_step in step.step_set.all|dictsort:"rank" %}
-                            {% for pool in child_step.pools.all %}
-                                <div class="card col-5">
-                                    <div class="card-body">
-                                        <div class="row">
+        {% for step in steps %}
+            <div class="gap-1">
+                <h2>Finale des rangs {{ forloop.counter }}</h2>
+                <div class="row d-flex justify-content-around gap-2">
+                    {% for child_step in step.step_set.all|dictsort:"rank" %}
+                        {% for pool in child_step.pools.all %}
+                            <div class="card col-5">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-9">
                                             {% load custom_filters %}
-                                            <h3>Rencontre {% next_item %}-{% next_item %}</h3>
+                                        <h3>Rencontre {% next_item %}-{% next_item %}</h3>
                                         </div>
-                                        <div class="row">
-                                            {% for player in pool.players.all %}
-                                                <div class="row">
-                                                    <div class="col-8">
-                                                        Joueur {{ forloop.counter }}: {{ player.player.last_name }} {{ player.player.first_name }}
-                                                        ({{ player.player.points }} points)
-                                                    </div>
-                                                    {% if pool.validated %}
-                                                        <div class="col-4">
-                                                            Rang: {{ player.rank }}, coeff: {{ player.coeff }}
-                                                        </div>
-                                                    {% endif %}
-                                                </div>
-                                            {% endfor %}
+                                        <div class="col-3">
+                                            {% if pool.is_done %}
+                                    <a class="btn btn-primary" href="{% url "validate_pool" step.pk pool.pk %}"
+                                       style="font-size: 0.8em">Valider le match</a>
+                                {% else %}
+                                    <a class="btn btn-primary disabled" style="font-size: 0.8em">Valider le match</a>
+                                {% endif %}
                                         </div>
-                                        <table class="table table-striped" style="font-size: 0.7em">
-                                            <thead>
-                                            <tr>
-                                                <th scope="col">#</th>
-                                                <th style="width: 100px" scope="col">Joueur 1</th>
-                                                <th style="width: 100px" scope="col">Joueur 2</th>
-                                                <th scope="col">Sets</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {% for game in pool.games.all %}
-                                                <tr>
-                                                    <th scope="col">{{ forloop.counter }}</th>
-                                                    <td>{{ game.player_one.last_name }} {{ game.player_one.first_name }}</td>
-                                                    <td>{{ game.player_two.last_name }} {{ game.player_two.first_name }}</td>
-                                                    <td>
-                                                        <div class="row d-flex justify-content-between">
-                                                            <form method="post" action="{% url "update_game" game.pk %}"
-                                                                  class="col d-flex justify-content-start"
-                                                                  style="width: 300px">
-                                                                {% csrf_token %}
-                                                                {% for set in game.sets.all %}
-                                                                    <div class="col mx-1"
-                                                                         style="min-width: 50px; max-width: 50px">
-                                                                        <label class="form-label"
-                                                                               for="{{ set.pk }}">Set {{ forloop.counter }}</label>
-                                                                        <input class="form-control" id="{{ set.pk }}"
-                                                                               type="text"
-                                                                               name="{{ set.pk }}"
-                                                                               value="{{ set.score|default_if_none:"" }}">
-                                                                    </div>
-                                                                {% endfor %}
-                                                                <button class="btn" type="submit"
-                                                                        style="width: 40px;height: 40px; padding: 0; font-size: 20px">
-                                                                    ✔
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            {% endfor %}
-                                            </tbody>
-                                        </table>
                                     </div>
+                                    <div class="row">
+                                        {% for player in pool.players.all %}
+                                            <div class="row">
+                                                <div class="col-8">
+                                                    Joueur {{ forloop.counter }}: {{ player.player.last_name }} {{ player.player.first_name }}
+                                                    ({{ player.player.points }} points)
+                                                </div>
+                                                {% if pool.validated %}
+                                                    <div class="col-4">
+                                                        Rang: {{ player.rank }}, coeff: {{ player.coeff }}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <table class="table table-striped" style="font-size: 0.7em">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th style="width: 100px" scope="col">Joueur 1</th>
+                                            <th style="width: 100px" scope="col">Joueur 2</th>
+                                            <th scope="col">Sets</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for game in pool.games.all %}
+                                            <tr>
+                                                <th scope="col">{{ forloop.counter }}</th>
+                                                <td>{{ game.player_one.last_name }} {{ game.player_one.first_name }}</td>
+                                                <td>{{ game.player_two.last_name }} {{ game.player_two.first_name }}</td>
+                                                <td>
+                                                    <div class="row d-flex justify-content-between">
+                                                        <form method="post" action="{% url "update_game" game.pk %}"
+                                                              class="col d-flex justify-content-start"
+                                                              style="width: 300px">
+                                                            {% csrf_token %}
+                                                            {% for set in game.sets.all %}
+                                                                <div class="col mx-1"
+                                                                     style="min-width: 50px; max-width: 50px">
+                                                                    <label class="form-label"
+                                                                           for="{{ set.pk }}">Set {{ forloop.counter }}</label>
+                                                                    <input class="form-control" id="{{ set.pk }}"
+                                                                           type="text"
+                                                                           name="{{ set.pk }}"
+                                                                           value="{{ set.score|default_if_none:"" }}">
+                                                                </div>
+                                                            {% endfor %}
+                                                            <button class="btn" type="submit"
+                                                                    style="width: 40px;height: 40px; padding: 0; font-size: 20px">
+                                                                ✔
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
                                 </div>
-                            {% endfor %}
-
+                            </div>
                         {% endfor %}
 
-                    </div>
+                    {% endfor %}
+
                 </div>
-                <hr class="border border-primary border-3 opacity-75">
-            {% endfor %}
+            </div>
+            <hr class="border border-primary border-3 opacity-75">
+        {% endfor %}
 
     </div>
 {% endblock %}
