@@ -17,12 +17,29 @@
                 <h1>Détails du Tournoi: {{ tournament.name }}</h1>
             </div>
             {% if tournament.step_set %}
-            <div class="col-2 p-2 mx-2">
-            {% if tournament.step_set.all|length == 0 %}
-                <a class="btn btn-primary" href="{% url 'create_first_step' tournament.pk %}">Clôturer les inscriptions</a>
-            {% else %}
-                <a class="btn btn-primary" href="{% url 'steps' tournament.pk %}">Accéder aux poules</a>
-            {% endif %}
+                <div class="col-4 p-2 mx-2">
+                    {% if tournament.step_set.all|length == 0 %}
+                        <form class="row" method="post" action="{% url 'create_first_step' tournament.pk %}">
+                            {% csrf_token %}
+                            <div class="col">
+                                <label for="players">Joueurs par équipe :</label>
+                                <select class="form-select" id="players" name="players">
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                </select>
+                            </div>
+                            <div class="col">
+                                <button class="btn btn-primary" type="submit">Clôturer les
+                                    inscriptions
+                                </button>
+                            </div>
+                        </form>
+
+                    {% else %}
+                        <a class="btn btn-primary" href="{% url 'steps' tournament.pk %}">Accéder aux poules</a>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>

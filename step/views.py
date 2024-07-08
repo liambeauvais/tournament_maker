@@ -3,6 +3,7 @@ import math
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView
 
+from player.models import Player
 from pool.models import Pool, PoolPLayer
 from step.functions.scoreboard import create_pool_scoreboard
 from step.functions.step_generation import generate_pools
@@ -12,6 +13,8 @@ from tournament.models import Tournament
 
 def create_first_step(request, *args, **kwargs):
     tournament = get_object_or_404(Tournament, id=kwargs.get('pk'))
+    players_by_pool = int(request.POST.get('players'))
+    print(request.POST)
     if tournament.step_set.count() == 0:
         players = tournament.players.order_by('-points').all()
         step = Step.objects.create(
@@ -23,9 +26,9 @@ def create_first_step(request, *args, **kwargs):
             step.players.add(player)
         step.save()
 
-        numbers_of_pools = len(players) // 3 + (1 if len(players) % 3 != 0 else 0)
+        numbers_of_pools = len(players) // players_by_pool + (1 if len(players) % players_by_pool != 0 else 0)
 
-        generate_pools(numbers_of_pools, players, step.pk, 3)
+        generate_pools(numbers_of_pools, players, step.pk, players_by_pool)
     return redirect('steps', pk=tournament.pk)
 
 
@@ -38,15 +41,16 @@ def create_second_step(request, *args, **kwargs):
     }
     for pool in first_step.pools.all():
         for pool_player in pool.players.all():
-            ranks[str(pool_player.rank)].append(pool_player.player)
+            ranks[str(pool_player.rank)].append(pool_player.player.pk)
 
-    for rank, players in ranks.items():
+    for rank, player_ids in ranks.items():
         step = Step.objects.create(
             last_step=first_step,
             tournament_id=first_step.tournament.pk,
             rank=int(rank)
         )
         step.save()
+        players = Player.objects.filter(pk__in=player_ids).all()
         generate_pools(2, players, step.pk, math.ceil(float(len(players) / 2)))
 
     return redirect('second_steps', pk=first_step.tournament.pk)
@@ -61,17 +65,18 @@ def create_final_steps(request, *args, **kwargs):
         for pool in second_step.pools.all():
             for pool_player in pool.players.all():
                 if pool_player.rank in ranks:
-                    ranks[pool_player.rank].append(pool_player.player)
+                    ranks[pool_player.rank].append(pool_player.player.pk)
                 else:
-                    ranks[pool_player.rank] = [pool_player.player]
+                    ranks[pool_player.rank] = [pool_player.player.pk]
 
-        for rank, players in ranks.items():
+        for rank, player_ids in ranks.items():
             step = Step.objects.create(
                 last_step=second_step,
                 tournament_id=first_step.tournament.pk,
                 rank=int(rank)
             )
             step.save()
+            players = Player.objects.filter(pk__in=player_ids).all()
             generate_pools(1, players, step.pk, 2)
     return redirect('final_steps', pk=first_step.tournament.pk)
 

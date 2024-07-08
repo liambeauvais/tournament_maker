@@ -17,10 +17,15 @@ def generate_round_robin_games(players: QuerySet[PoolPLayer], tournament_id: Typ
         players_id.append(mock_player.pk)
         num_players += 1
 
-    players = Player.objects.filter(pk__in=players_id).order_by("points").all()
+    players = Player.objects.filter(pk__in=players_id).order_by('-points').all()
+    players_indexed = [
+        {'index':index, 'player':players[index]}
+        for index in range(num_players)
+    ]
+    print(players_indexed)
     # Fix the first player
-    fixed_player = players[0]
-    rotating_players = players[1:]
+    fixed_player = players_indexed[0]
+    rotating_players = players_indexed[1:]
 
     games: list[Game] = []
 
@@ -28,34 +33,36 @@ def generate_round_robin_games(players: QuerySet[PoolPLayer], tournament_id: Typ
         # Add matches for the current round
         games.append(
             Game(
-                player_one_id=fixed_player.pk,
-                player_two_id=rotating_players[len(rotating_players)-1].pk,
+                player_one_id=fixed_player['player'].pk,
+                player_two_id=rotating_players[len(rotating_players) - 1]['player'].pk,
                 tournament_id=tournament_id
             )
         )
         for i in range((num_players - 1) // 2):
+            opponents = [
+                rotating_players[i],
+                rotating_players[len(rotating_players) - 2 - i],
+            ]
+            opponents = sorted(opponents, key=lambda x: x['index'])
             games.append(
                 Game(
-                    player_one_id=rotating_players[i].pk,
-                    player_two_id=rotating_players[len(rotating_players) -2 - i].pk,
+                    player_one_id=opponents[0]['player'].pk,
+                    player_two_id=opponents[1]['player'].pk,
                     tournament_id=tournament_id
                 )
             )
 
         # Rotate players for the next round
-        rotating_players = [rotating_players[len(rotating_players)-1]] + rotating_players[:len(rotating_players)-1]
+        rotating_players = [rotating_players[len(rotating_players) - 1]] + rotating_players[:len(rotating_players) - 1]
 
     games_without_mock = []
     for game in games:
         if game.player_one.pk != mock_player.pk and game.player_two.pk != mock_player.pk:
             games_without_mock.append(game)
 
-
     if len(games_without_mock) == 3:
         first_game = games_without_mock.pop(0)
         games_without_mock.append(first_game)
-        second_game = games_without_mock.pop(1)
-        games_without_mock.insert(0, second_game)
 
     return games_without_mock
 
@@ -79,7 +86,7 @@ def generate_pool_matches(pools: list[Pool]):
                 set.save()
 
 
-def generate_pools(numbers_of_pools: int, players: list[Player], step_id: int, players_by_pool: int = None):
+def generate_pools(numbers_of_pools: int, players: QuerySet[Player], step_id: int, players_by_pool: int = None):
     for i in range(numbers_of_pools):
         pool = Pool.objects.create(
             step_id=step_id
@@ -87,13 +94,13 @@ def generate_pools(numbers_of_pools: int, players: list[Player], step_id: int, p
         pool.save()
     pools = Pool.objects.filter(step_id=step_id).all()
     count = 0
-
+    players_sorted = players.order_by("-points")
     for i in range(players_by_pool):
         for pool in pools:
             if len(players) > count:
                 pool_player = PoolPLayer.objects.create(
                     pool_id=pool.pk,
-                    player_id=players[count].pk
+                    player_id=players_sorted[count].pk
                 )
                 pool_player.save()
                 count += 1
