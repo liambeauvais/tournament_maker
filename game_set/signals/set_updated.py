@@ -13,7 +13,7 @@ def set_updated(sender, instance: Set, created, **kwargs):
         player_two = 0
         for set in game.sets.all():
             if set.score is not None:
-                if set.score > 0:
+                if set.score >= 0:
                     player_one += 1
                 else:
                     player_two += 1
