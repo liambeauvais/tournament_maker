@@ -14,7 +14,6 @@ def multiply(value, arg):
 
 @register.simple_tag(takes_context=True)
 def next_item(context):
-    print(context['counter'])
     my_iter = context['counter']
     try:
         return next(my_iter)

@@ -34,14 +34,13 @@ def create_first_step(request, *args, **kwargs):
 
 def create_second_step(request, *args, **kwargs):
     first_step = get_object_or_404(Step, id=kwargs.get('pk'))
-    ranks = {
-        "1": [],
-        "2": [],
-        "3": []
-    }
+    ranks = {}
     for pool in first_step.pools.all():
         for pool_player in pool.players.all():
-            ranks[str(pool_player.rank)].append(pool_player.player.pk)
+            if pool_player.rank in ranks:
+                ranks[pool_player.rank].append(pool_player.player.pk)
+            else:
+                ranks[pool_player.rank] = [pool_player.player.pk]
 
     for rank, player_ids in ranks.items():
         step = Step.objects.create(
@@ -138,6 +137,7 @@ class FinalStepsView(TemplateView):
             for second_step in first_step.step_set.all()
             for step in second_step.step_set.all()
         )
+        print(context['steps_are_done'])
         return context
 
 

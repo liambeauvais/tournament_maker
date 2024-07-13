@@ -54,10 +54,11 @@ class TournamentDetailView(DetailView):
     context_object_name = 'tournament'
 
     def get_available_players(self):
-            if self.object.category == "C":
-                return Player.objects.exclude(tournaments=self.object).exclude(points=0)
-            else:
-                return Player.objects.exclude(tournaments=self.object)
+        print(self.object.category)
+        if self.object.category == "C":
+            return Player.objects.exclude(tournaments=self.object).exclude(points=0).all()
+        else:
+            return Player.objects.exclude(tournaments=self.object).filter(points=0).all()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -93,7 +94,3 @@ def delete_player_from_tournament(request, *args, **kwargs):
     player = get_object_or_404(Player, id=kwargs.get("player_id"))
     tournament.players.remove(player)
     return redirect('tournament_detail', pk=tournament.pk)
-
-
-
-
