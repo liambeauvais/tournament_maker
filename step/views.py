@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 
 from player.models import Player
 from pool.models import Pool, PoolPLayer
-from step.functions.scoreboard import create_pool_scoreboard
+from step.functions.scoreboard import create_pool_scoreboard, PlayerForSettle
 from step.functions.step_generation import generate_pools
 from step.models import Step
 from tournament.models import Tournament
@@ -145,14 +145,13 @@ def validate_pool(request, *args, **kwargs):
     pool = Pool.objects.get(pk=kwargs.get("pool_pk"))
     pool.validated = True
     pool.save()
-    coeffs = create_pool_scoreboard(pool)
-    sorted_coeffs = sorted(coeffs, key=lambda x: x['coeff'], reverse=True)
+    scoreboard: list[PlayerForSettle] = create_pool_scoreboard(pool)
     count = 1
-    for coef in sorted_coeffs:
-        step_player = PoolPLayer.objects.get(player_id=coef['player_pk'], pool_id=pool.pk)
-        step_player.rank = count
-        step_player.coeff = coef['coeff']
-        step_player.save()
+    for player in scoreboard:
+        pool_player = PoolPLayer.objects.get(player_id=player.id, pool_id=pool.pk)
+        pool_player.rank = count
+        pool_player.coeff = player.coefficient
+        pool_player.save()
         count += 1
     # return redirect('steps', pk=pool.step.tournament.pk)
     return redirect(request.META.get('HTTP_REFERER'))
