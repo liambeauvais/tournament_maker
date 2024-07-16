@@ -32,7 +32,7 @@
                 <div class="row d-flex justify-content-around gap-2">
                     {% for child_step in step.step_set.all|dictsort:"rank" %}
                         {% for pool in child_step.pools.all %}
-                            <div class="card col-5">
+                            <div class="card col-5" id={{ pool.pk }}>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-9">

@@ -16,10 +16,10 @@ def value_is_digit(value):
 
 
 def update_game(request, *args, **kwargs):
+    game_set = None
     for key, value in request.POST.items():
         if key == "csrfmiddlewaretoken":
             continue
-
         game_set = Set.objects.get(pk=key)
         if not value_is_digit(value):
             game_set.score = None
@@ -27,4 +27,6 @@ def update_game(request, *args, **kwargs):
         else:
             game_set.score = int(value)
             game_set.save()
-    return redirect(request.META.get('HTTP_REFERER'))
+    referer_url = request.META.get('HTTP_REFERER', '/')
+    referer_url += f'#{game_set.game.pools.all()[0].id}'
+    return redirect(referer_url)

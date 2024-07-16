@@ -33,7 +33,7 @@
         </div>
         <div class="row d-flex justify-content-around gap-3">
             {% for pool in step.pools.all %}
-                <div class="card" style="min-width:650px; max-width: 650px">
+                <div class="card" style="min-width:650px; max-width: 650px" id={{ pool.pk }}>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-9">
