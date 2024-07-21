@@ -3,6 +3,8 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import TemplateView, DetailView
 
 from player.models import Player
+from step.models import Step
+from .functions.pdf import get_tournament_steps, get_steps_pools, render_to_pdf
 from .models import Tournament, CATEGORIES, TOURNAMENT_TYPES
 
 
@@ -94,3 +96,31 @@ def delete_player_from_tournament(request, *args, **kwargs):
     player = get_object_or_404(Player, id=kwargs.get("player_id"))
     tournament.players.remove(player)
     return redirect('tournament_detail', pk=tournament.pk)
+
+
+def pdf_view(request, *args, **kwargs):
+    step = Step.objects.get(pk=kwargs.get('step_pk'))
+    step_iteration = kwargs.get('step_iteration')
+    steps: list[Step] = get_tournament_steps(step, step_iteration)
+    max_players = 2
+    for step in steps:
+        for pool in step.pools.all():
+            if pool.players.count() > max_players:
+                max_players = pool.players.count()
+
+    match max_players:
+        case 3:
+            pools_by_page = 6
+        case 4:
+            pools_by_page = 4
+        case 5:
+            pools_by_page = 3
+        case 6:
+            pools_by_page = 2
+        case _:
+            pools_by_page = 9
+    pools = get_steps_pools(steps, pools_by_page)
+    context = {
+        'pools': pools
+    }
+    return render_to_pdf('my_template.html', context)

@@ -14,7 +14,8 @@
             <div class="col-10">
                 <p class="fs-1">Premières poules</p>
             </div>
-            <div class="col-2 d-flex justify-content-center align-items-center">
+            <div class="col-2 d-flex justify-content-center align-items-center gap-2">
+                 <a class="btn btn-primary" href="{% url 'step_pdf' step.pk 1 %}" target="_blank">Imprimer les poules</a>
                 {% if step.is_done %}
                     {% if step.step_set.all|length == 0 %}
                         <a class="btn btn-primary" href="{% url 'create_second_step' step.pk %}">Créer les deuxièmes

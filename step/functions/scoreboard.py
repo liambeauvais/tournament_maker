@@ -20,11 +20,11 @@ class PlayerForSettle:
         won_sets, lost_sets = 0, 0
         for match in self.matches:
             if match[0] in opponents:
-                print()
                 won_sets += match[1]
                 lost_sets += match[2]
-        if self.lost_sets == 0:
-            return float('inf')
+
+        if lost_sets == 0:
+            lost_sets = 1
         return won_sets / lost_sets
 
     def ratio_points(self, opponents: list[int]):
@@ -33,8 +33,8 @@ class PlayerForSettle:
             if match[0] in opponents:
                 won_points += match[3]
                 lost_points += match[4]
-        if self.lost_points == 0:
-            return float('inf')
+        if lost_points == 0:
+            lost_points = 1
         return won_points / lost_points
 
     def add_result(self, opponent: int, won_sets, lost_sets, won_points, lost_points):
@@ -111,6 +111,7 @@ def create_pool_scoreboard(pool: Pool):
             groups[player.wins] = []
         groups[player.wins].append(player)
 
+    results = []
     results = []
     for wins, group in groups.items():
         if len(group) > 1:

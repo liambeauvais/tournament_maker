@@ -14,7 +14,6 @@ from tournament.models import Tournament
 def create_first_step(request, *args, **kwargs):
     tournament = get_object_or_404(Tournament, id=kwargs.get('pk'))
     players_by_pool = int(request.POST.get('players'))
-    print(request.POST)
     if tournament.step_set.count() == 0:
         players = tournament.players.order_by('-points').all()
         step = Step.objects.create(
@@ -87,7 +86,6 @@ class StepView(TemplateView):
         context = super().get_context_data(**kwargs)
         first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
         context['title'] = f"{first_step.tournament.date}-{first_step.tournament.get_category_display()}"
-
         context['step'] = first_step
         context['number_of_sets'] = [i + 1 for i in range(first_step.tournament.set_number)]
         return context
@@ -120,6 +118,7 @@ class FinalStepsView(TemplateView):
 
         second_steps = first_step.step_set.all()
         context['tournament'] = first_step.tournament
+        context['first_step'] = first_step
         context["steps"] = second_steps
         context['number_of_sets'] = [i + 1 for i in range(first_step.tournament.set_number)]
         number_of_pools = 0

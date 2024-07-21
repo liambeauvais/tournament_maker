@@ -19,10 +19,9 @@ def generate_round_robin_games(players: QuerySet[PoolPLayer], tournament_id: Typ
 
     players = Player.objects.filter(pk__in=players_id).order_by('-points').all()
     players_indexed = [
-        {'index':index, 'player':players[index]}
+        {'index': index, 'player': players[index]}
         for index in range(num_players)
     ]
-    print(players_indexed)
     # Fix the first player
     fixed_player = players_indexed[0]
     rotating_players = players_indexed[1:]

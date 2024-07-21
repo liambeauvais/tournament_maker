@@ -1,0 +1,88 @@
+<!-- myapp/templates/my_template.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Report</title>
+</head>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    p {
+        font-size: 0.5em;
+    }
+
+    th, td {
+        border: 1px solid black;
+        padding: 2px;
+        text-align: center;
+    }
+
+    .pool-container {
+        margin-bottom: 10px;
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+</style>
+<body>
+{% for pool in pools %}
+
+    <div id="pool-container" class="pool-container">
+        <div>
+            {% for player in pool.pool.players.all %}
+                <p>
+                    Joueur {{ forloop.counter }}: {{ player.player.last_name }} {{ player.player.first_name }}({{ player.player.points }}
+                    points)</p>
+            {% endfor %}
+
+        </div>
+        <table style="font-size: 0.5em">
+            <thead>
+            <tr>
+                <th id="other" colspan="8">Poule {{ pool.step_count }}, rang {{ pool.rank }}, TABLE:</th>
+                <th id="winner" colspan="{{ pool.pool.players.all|length }}">Gagnant</th>
+            </tr>
+            <tr>
+                <th headers="other">#</th>
+                <th headers="other">Joueur 1</th>
+                <th headers="other">Joueur 2</th>
+                <th headers="other" colspan="5">Sets</th>
+                {% for player in pool.pool.players.all %}
+                    <th headers="winner">{{ forloop.counter }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for game in pool.pool.games.all %}
+                <tr style="text-align: center">
+                    <td style="width: 10px; padding: 2px">{{ forloop.counter }}</td>
+                    <td style="width: 150px; padding: 2px">{{ game.player_one.last_name }} {{ game.player_one.first_name }}</td>
+                    <td style="width: 150px; padding: 2px">{{ game.player_two.last_name }} {{ game.player_two.first_name }}</td>
+
+                    {% for set in game.sets.all %}
+                        <td style="width: 50px"></td>
+                    {% endfor %}
+
+
+                    {% for player in pool.pool.players.all %}
+                        <td style="width: 10px"></td>
+                    {% endfor %}
+
+                </tr>
+            {% endfor %}
+
+            </tbody>
+        </table>
+    <hr>
+    </div>
+    {% if pool.next_page %}
+        <pdf:nextpage>
+    {% endif %} 
+{% endfor %}
+
+
+</body>
+</html>

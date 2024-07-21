@@ -11,7 +11,8 @@
         <div class="col-10">
             <p class="fs-1">Phase finale</p>
         </div>
-        <div class="col-2">
+        <div class="col-2 d-flex justify-content-center align-items-center gap-2">
+            <a class="btn btn-primary" href="{% url 'step_pdf' first_step.pk 3 %}" target="_blank">Imprimer les poules</a>
             {% if steps_are_done %}
                 {% if not tournament.scoreboard %}
                     <a class="btn btn-primary" href="{% url 'create_scoreboard' tournament.pk %}">Créer le
@@ -37,7 +38,7 @@
                                     <div class="row">
                                         <div class="col-9">
                                             {% load custom_filters %}
-                                        <h3>Rencontre {% next_item %}-{% next_item %}</h3>
+                                        <h3>Rencontre {% next_item %}{% if pool.players.all|length > 1 %}-{% next_item %}{% endif %} </h3>
                                         </div>
                                         <div class="col-3">
                                             {% if pool.is_done %}

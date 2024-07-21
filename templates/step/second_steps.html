@@ -13,7 +13,8 @@
         <div class="col-10">
             <p class="fs-1">Seconde phase</p>
         </div>
-        <div class="col-2 d-flex justify-content-center align-items-center">
+        <div class="col-2 d-flex justify-content-center align-items-center gap-2">
+            <a class="btn btn-primary" href="{% url 'step_pdf' firs_step.pk 2 %}" target="_blank">Imprimer les poules</a>
             {% if steps_are_done %}
                 {% if not_created %}
                     <a class="btn btn-primary" href="{% url 'create_final_steps' firs_step.pk %}">Créer le tableau

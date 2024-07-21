@@ -4,7 +4,7 @@ from scoreboard.views import ScoreBoardView, create_scoreboard
 from step.views import create_first_step, StepView, SecondStepsView, create_final_steps, FinalStepsView, \
     create_second_step
 from tournament.views import TournamentView, TournamentDetailView, add_player_to_tournament, \
-    delete_player_from_tournament
+    delete_player_from_tournament, pdf_view
 
 urlpatterns = [
     path('', TournamentView.as_view(), name='tournaments'),
@@ -22,5 +22,8 @@ urlpatterns = [
 
     path('<int:pk>/create_scoreboard/', create_scoreboard, name='create_scoreboard'),
     path('<int:pk>/scoreboard/', ScoreBoardView.as_view(), name='scoreboard'),
+    path("<int:step_pk>/pdf/<int:step_iteration>", pdf_view, name='step_pdf'),
+    path("pdf/", pdf_view, name='step_pdf'),
 
 ]
+
