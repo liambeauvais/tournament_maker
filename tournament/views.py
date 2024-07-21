@@ -56,9 +56,9 @@ class TournamentDetailView(DetailView):
     def get_available_players(self):
         print(self.object.category)
         if self.object.category == "C":
-            return Player.objects.exclude(tournaments=self.object).exclude(points=0).all()
+            return Player.objects.exclude(tournaments=self.object).exclude(points=0).all().order_by('last_name')
         else:
-            return Player.objects.exclude(tournaments=self.object).filter(points=0).all()
+            return Player.objects.exclude(tournaments=self.object).filter(points=0).all().order_by('last_name')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

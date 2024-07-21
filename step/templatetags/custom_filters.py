@@ -19,3 +19,8 @@ def next_item(context):
         return next(my_iter)
     except StopIteration:
         return None
+
+
+@register.filter
+def sort_by(queryset, order):
+    return queryset.order_by(order)
