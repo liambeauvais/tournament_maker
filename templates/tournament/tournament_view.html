@@ -17,7 +17,6 @@
                 <tr>
                     <th scope="col">Nom</th>
                     <th scope="col">Date</th>
-                    <th scope="col">Nombre de sets</th>
                     <th scope="col">Type</th>
                 </tr>
                 </thead>
@@ -26,8 +25,7 @@
                     <tr onclick="window.location.href='{% url 'tournament_detail' tournament.pk %}'" style="cursor: pointer;">
                         <td>{{ tournament.name }}</td>
                         <td>{{ tournament.date }}</td>
-                        <td>{{ tournament.set_number }}</td>
-                        <td>{{ tournament.get_type_display }}</td>
+                        <td>{{ tournament.get_category_display }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>

@@ -10,15 +10,31 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-10">
+        <div class="col-8">
             <p class="fs-1">Seconde phase</p>
         </div>
-        <div class="col-2 d-flex justify-content-center align-items-center gap-2">
-            <a class="btn btn-primary" href="{% url 'step_pdf' firs_step.pk 2 %}" target="_blank">Imprimer les poules</a>
+        <div class="col-4 d-flex justify-content-center align-items-center gap-2">
+            <a class="btn btn-primary" href="{% url 'step_pdf' firs_step.pk 2 %}" target="_blank">Imprimer les
+                poules</a>
             {% if steps_are_done %}
                 {% if not_created %}
-                    <a class="btn btn-primary" href="{% url 'create_final_steps' firs_step.pk %}">Créer le tableau
-                        final</a>
+                    <form class="row" method="post" action="{% url 'create_final_steps' firs_step.pk %}">
+                        {% csrf_token %}
+                        <div class="col">
+                            <label for="set_number">
+                                Nombre de sets
+                            </label>
+                            <select class="form-select" id="set_number" name="set_number">
+                                <option value="3">3</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary">Créer le tableau
+                                final
+                            </button>
+                        </div>
+                    </form>
                 {% else %}
                     <a class="btn btn-primary" href="{% url 'final_steps' firs_step.tournament.pk %}">Accéder au tableau
                         final</a>

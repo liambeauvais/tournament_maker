@@ -16,7 +16,6 @@ TOURNAMENT_TYPES = [
 class Tournament(models.Model):
     date = models.DateField()
     name = models.CharField(max_length=100)
-    set_number = models.IntegerField(default=5)
     category = models.CharField(max_length=100, choices=CATEGORIES, default="C")
     closed = models.BooleanField(default=False)
     tournament_type = models.CharField(max_length=100, choices=TOURNAMENT_TYPES, default="CLASSIC")

@@ -28,5 +28,5 @@ def update_game(request, *args, **kwargs):
             game_set.score = int(value)
             game_set.save()
     referer_url = request.META.get('HTTP_REFERER', '/')
-    referer_url += f'#{game_set.game.pools.all()[0].id}'
+    referer_url += f'#{game_set.game.pool.id}'
     return redirect(referer_url)

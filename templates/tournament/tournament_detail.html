@@ -31,6 +31,15 @@
                                 </select>
                             </div>
                             <div class="col">
+                                <label for="set_number">
+                                    Nombre de sets
+                                </label>
+                                <select class="form-select" id="set_number" name="set_number">
+                                    <option value="3">3</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                            <div class="col">
                                 <button class="btn btn-primary" type="submit">Clôturer les
                                     inscriptions
                                 </button>
@@ -46,7 +55,6 @@
         <hr>
         <div class="row d-flex justify-content-center">
             <p style="width: fit-content">Date: {{ tournament.date }}</p>
-            <p style="width: fit-content">Nombre de sets: {{ tournament.set_number }}</p>
             <p style="width: fit-content">Catégorie: {{ tournament.get_category_display }}</p>
             <p style="width: fit-content">type: {{ tournament.get_tournament_type_display }}</p>
         </div>

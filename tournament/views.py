@@ -11,7 +11,7 @@ from .models import Tournament, CATEGORIES, TOURNAMENT_TYPES
 class TournamentForm(forms.ModelForm):
     class Meta:
         model = Tournament
-        fields = ['date', 'name', 'set_number', 'category', 'tournament_type']
+        fields = ['date', 'name', 'category', 'tournament_type']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),
             'category': forms.Select(choices=[(k, v) for k, v in CATEGORIES]),
@@ -119,7 +119,10 @@ def pdf_view(request, *args, **kwargs):
             pools_by_page = 2
         case _:
             pools_by_page = 9
-    pools = get_steps_pools(steps, pools_by_page)
+    pools = get_steps_pools(
+        steps,
+        pools_by_page,
+        is_last_step=step_iteration > 2)
     context = {
         'pools': pools
     }

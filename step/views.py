@@ -14,11 +14,14 @@ from tournament.models import Tournament
 def create_first_step(request, *args, **kwargs):
     tournament = get_object_or_404(Tournament, id=kwargs.get('pk'))
     players_by_pool = int(request.POST.get('players'))
+    set_number = int(request.POST.get('set_number'))
+
     if tournament.step_set.count() == 0:
         players = tournament.players.order_by('-points').all()
         step = Step.objects.create(
             last_step=None,
             tournament_id=tournament.pk,
+            set_number=set_number,
         )
         step.save()
         for player in players:
@@ -33,6 +36,7 @@ def create_first_step(request, *args, **kwargs):
 
 def create_second_step(request, *args, **kwargs):
     first_step = get_object_or_404(Step, id=kwargs.get('pk'))
+    set_number = int(request.POST.get('set_number'))
     ranks = {}
     for pool in first_step.pools.all():
         for pool_player in pool.players.all():
@@ -45,7 +49,8 @@ def create_second_step(request, *args, **kwargs):
         step = Step.objects.create(
             last_step=first_step,
             tournament_id=first_step.tournament.pk,
-            rank=int(rank)
+            rank=int(rank),
+            set_number=set_number,
         )
         step.save()
         players = Player.objects.filter(pk__in=player_ids).all()
@@ -56,6 +61,7 @@ def create_second_step(request, *args, **kwargs):
 
 def create_final_steps(request, *args, **kwargs):
     first_step = get_object_or_404(Step, id=kwargs.get('pk'))
+    set_number = int(request.POST.get('set_number'))
     second_steps = first_step.step_set.all()
     for second_step in second_steps:
         ranks = {
@@ -71,7 +77,8 @@ def create_final_steps(request, *args, **kwargs):
             step = Step.objects.create(
                 last_step=second_step,
                 tournament_id=first_step.tournament.pk,
-                rank=int(rank)
+                rank=int(rank),
+                set_number=set_number
             )
             step.save()
             players = Player.objects.filter(pk__in=player_ids).all()
@@ -87,7 +94,7 @@ class StepView(TemplateView):
         first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
         context['title'] = f"{first_step.tournament.date}-{first_step.tournament.get_category_display()}"
         context['step'] = first_step
-        context['number_of_sets'] = [i + 1 for i in range(first_step.tournament.set_number)]
+        context['number_of_sets'] = [i + 1 for i in range(first_step.set_number)]
         return context
 
 
@@ -102,7 +109,7 @@ class SecondStepsView(TemplateView):
         second_steps = first_step.step_set.all()
         context["steps"] = second_steps
         context["firs_step"] = first_step
-        context['number_of_sets'] = [i + 1 for i in range(first_step.tournament.set_number)]
+        context['number_of_sets'] = [i + 1 for i in range(context["steps"][0].set_number)]
         context['steps_are_done'] = all(step.is_done() for step in first_step.step_set.all())
         context['not_created'] = all(step.step_set.count() == 0 for step in first_step.step_set.all())
         return context
@@ -120,7 +127,7 @@ class FinalStepsView(TemplateView):
         context['tournament'] = first_step.tournament
         context['first_step'] = first_step
         context["steps"] = second_steps
-        context['number_of_sets'] = [i + 1 for i in range(first_step.tournament.set_number)]
+        context['number_of_sets'] = [i + 1 for i in range(context["steps"][0].set_number)]
         number_of_pools = 0
         for second_step in second_steps:
             for final_step in second_step.step_set.all():
@@ -136,7 +143,6 @@ class FinalStepsView(TemplateView):
             for second_step in first_step.step_set.all()
             for step in second_step.step_set.all()
         )
-        print(context['steps_are_done'])
         return context
 
 

@@ -10,9 +10,13 @@ class Step(models.Model):
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE)
     players = models.ManyToManyField(Player, related_name="steps")
     rank = models.IntegerField(default=0)
+    set_number = models.IntegerField(default=0)
 
     def is_done(self):
         return all(pool.validated for pool in self.pools.all())
+
+    def __str__(self):
+        return f"Step with rank {self.rank}"
 
 
 

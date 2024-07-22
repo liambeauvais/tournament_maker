@@ -42,14 +42,14 @@
         <table style="font-size: 0.5em">
             <thead>
             <tr>
-                <th id="other" colspan="8">Poule {{ pool.step_count }}, rang {{ pool.rank }}, TABLE:</th>
+                <th id="other" colspan="{{ pool.pool.step.set_number|add:3 }}">Poule {{ pool.step_count }}, rang {{ pool.rank }}, TABLE:</th>
                 <th id="winner" colspan="{{ pool.pool.players.all|length }}">Gagnant</th>
             </tr>
             <tr>
                 <th headers="other">#</th>
                 <th headers="other">Joueur 1</th>
                 <th headers="other">Joueur 2</th>
-                <th headers="other" colspan="5">Sets</th>
+                <th headers="other" colspan="{{ pool.pool.step.set_number }}">Sets</th>
                 {% for player in pool.pool.players.all %}
                     <th headers="winner">{{ forloop.counter }}</th>
                 {% endfor %}

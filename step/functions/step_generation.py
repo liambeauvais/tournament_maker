@@ -67,7 +67,7 @@ def generate_round_robin_games(players: QuerySet[PoolPLayer], tournament_id: Typ
 
 
 def generate_pool_matches(pools: list[Pool]):
-    number_of_sets = pools[0].step.tournament.set_number
+    number_of_sets = pools[0].step.set_number
     for pool in pools:
         games = generate_round_robin_games(pool.players.all(), pool.step.tournament_id)
         games = Game.objects.bulk_create(
@@ -85,7 +85,7 @@ def generate_pool_matches(pools: list[Pool]):
                 set.save()
 
 
-def generate_pools(numbers_of_pools: int, players: QuerySet[Player], step_id: int, players_by_pool: int = None):
+def generate_pools(numbers_of_pools: int, players: QuerySet[Player], step_id: int, players_by_pool: int = None, set_number:int=None):
     for i in range(numbers_of_pools):
         pool = Pool.objects.create(
             step_id=step_id

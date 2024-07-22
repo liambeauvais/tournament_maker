@@ -8,7 +8,7 @@ from game_set.models import Set
 def set_updated(sender, instance: Set, created, **kwargs):
     if not created:
         game = instance.game
-        number_of_sets = game.tournament.set_number // 2 + 1
+        number_of_sets = game.pool.step.set_number // 2 + 1
         player_one = 0
         player_two = 0
         for set in game.sets.all():
