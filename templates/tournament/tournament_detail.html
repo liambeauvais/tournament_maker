@@ -22,7 +22,7 @@
                         <form class="row" method="post" action="{% url 'create_first_step' tournament.pk %}">
                             {% csrf_token %}
                             <div class="col">
-                                <label for="players">Joueurs par équipe :</label>
+                                <label for="players">Joueurs par poule :</label>
                                 <select class="form-select" id="players" name="players">
                                     <option value="3">3</option>
                                     <option value="4">4</option>

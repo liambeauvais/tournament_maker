@@ -67,19 +67,36 @@
                             </div>
                         </div>
                         <div class="row">
-                            {% for player in pool.players.all %}
-                                <div class="row">
-                                    <div class="col-8">
+                            <div class="col-7">
+                                {% for player in pool.players.all %}
+                                    <div class="row">
                                         Joueur {{ forloop.counter }}: {{ player.player.last_name }} {{ player.player.first_name }}
-                                        ({{ player.player.points }} points) id {{ player.pk }}
+                                        ({{ player.player.points }} points)
                                     </div>
-                                    {% if pool.validated %}
-                                        <div class="col-4">
-                                            Rang: {{ player.rank }}, coeff: {{ player.coeff }}
+                                {% endfor %}
+                            </div>
+                            <div class="col-5">
+                                <form class="row border rounded" method="post"
+                                      action="{% url 'force_pool_validation' step.pk pool.pk %}">
+                                    {% csrf_token %}
+                                    <button
+                                            class="btn"
+                                            type="submit"
+                                            style="width: 40px;height: 40px; padding: 0; font-size: 20px; position: absolute; top: 70px; right:20px"
+                                    >✔
+                                    </button>
+                                    {% for player in pool.players.all %}
+                                        <div class="row">
+                                            <span style="width: 65px">Rang:</span><label
+                                                style="width: 40px; margin-right: 5px" for="{{ player.pk }}"><input
+                                                class="form-control" style="width: 40px; height: 24px;" type="text"
+                                                name="{{ player.pk }}" value="{{ player.rank }}"
+                                                id="{{ player.pk }}"></label><span
+                                                style="width: 100px"> Coeff: {{ player.coeff }}</span>
                                         </div>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
+                                    {% endfor %}
+                                </form>
+                            </div>
                         </div>
                         <table class="table table-striped" style="font-size: 0.7em">
                             <thead>

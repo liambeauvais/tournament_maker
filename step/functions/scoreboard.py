@@ -112,7 +112,6 @@ def create_pool_scoreboard(pool: Pool):
         groups[player.wins].append(player)
 
     results = []
-    results = []
     for wins, group in groups.items():
         if len(group) > 1:
             opponents = [opponent.id for opponent in group]

@@ -13,7 +13,7 @@ class Step(models.Model):
     set_number = models.IntegerField(default=0)
 
     def is_done(self):
-        return all(pool.validated for pool in self.pools.all())
+        return all(pool.is_validated() for pool in self.pools.all())
 
     def __str__(self):
         return f"Step with rank {self.rank}"

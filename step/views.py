@@ -3,6 +3,7 @@ import math
 from django.shortcuts import get_object_or_404, redirect
 from django.views.generic import TemplateView
 
+from game.views import value_is_digit
 from player.models import Player
 from pool.models import Pool, PoolPLayer
 from step.functions.scoreboard import create_pool_scoreboard, PlayerForSettle
@@ -148,8 +149,6 @@ class FinalStepsView(TemplateView):
 
 def validate_pool(request, *args, **kwargs):
     pool = Pool.objects.get(pk=kwargs.get("pool_pk"))
-    pool.validated = True
-    pool.save()
     scoreboard: list[PlayerForSettle] = create_pool_scoreboard(pool)
     count = 1
     for player in scoreboard:
@@ -158,5 +157,18 @@ def validate_pool(request, *args, **kwargs):
         pool_player.coeff = player.coefficient
         pool_player.save()
         count += 1
-    # return redirect('steps', pk=pool.step.tournament.pk)
+
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+def force_pool_validation(request, *args, **kwargs):
+    for key, value in request.POST.items():
+        if key == "csrfmiddlewaretoken":
+            continue
+        pool_player = PoolPLayer.objects.get(pk=int(key))
+        if value_is_digit(value):
+            pool_player.rank = value
+            pool_player.coeff = 0.0
+            pool_player.save()
+
     return redirect(request.META.get('HTTP_REFERER'))
