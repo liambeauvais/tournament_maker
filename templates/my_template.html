@@ -12,7 +12,7 @@
     }
 
     p {
-        font-size: 0.5em;
+        font-size: 1em;
     }
 
     th, td {
@@ -39,14 +39,14 @@
             {% endfor %}
 
         </div>
-        <table style="font-size: 0.5em">
+        <table style="font-size: 1em">
             <thead>
             <tr>
-                <th id="other" colspan="{{ pool.pool.step.set_number|add:3 }}">Poule {{ pool.step_count }}, rang {{ pool.rank }}, TABLE:</th>
+                <th id="other" colspan="2">{{ pool.pool.step.tournament.get_category_display }}</th>
+                <th id="other" colspan="{{ pool.pool.step.set_number }}">Poule {{ pool.step_count }}, rang {{ pool.rank }}, TABLE:</th>
                 <th id="winner" colspan="{{ pool.pool.players.all|length }}">Gagnant</th>
             </tr>
             <tr>
-                <th headers="other">#</th>
                 <th headers="other">Joueur 1</th>
                 <th headers="other">Joueur 2</th>
                 <th headers="other" colspan="{{ pool.pool.step.set_number }}">Sets</th>
@@ -58,17 +58,16 @@
             <tbody>
             {% for game in pool.pool.games.all %}
                 <tr style="text-align: center">
-                    <td style="width: 10px; padding: 2px">{{ forloop.counter }}</td>
                     <td style="width: 150px; padding: 2px">{{ game.player_one.last_name }} {{ game.player_one.first_name }}</td>
                     <td style="width: 150px; padding: 2px">{{ game.player_two.last_name }} {{ game.player_two.first_name }}</td>
 
                     {% for set in game.sets.all %}
-                        <td style="width: 50px"></td>
+                        <td style="width: 40px"></td>
                     {% endfor %}
 
 
                     {% for player in pool.pool.players.all %}
-                        <td style="width: 10px"></td>
+                        <td style="width: 20px"></td>
                     {% endfor %}
 
                 </tr>

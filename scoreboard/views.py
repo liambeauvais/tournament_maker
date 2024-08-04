@@ -13,7 +13,6 @@ def create_scoreboard(request, *args, **kwargs):
     scoreboard = Scoreboard(tournament=tournament)
     scoreboard.save()
 
-    print(scoreboard)
     count = 1
     first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
     for second_step in first_step.step_set.all().order_by('rank'):

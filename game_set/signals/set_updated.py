@@ -20,8 +20,8 @@ def set_updated(sender, instance: Set, created, **kwargs):
         if player_one == number_of_sets or player_two == number_of_sets:
             if player_one == number_of_sets:
                 game.winner = game.player_one
-                print(game.winner)
+
             else:
                 game.winner = game.player_two
-                print(game.winner)
+
             game.save()

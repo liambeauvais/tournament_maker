@@ -9,7 +9,14 @@
     <meta charset="UTF-8">
     <title>{{ title }}</title>
 </head>
-<body>
+<body style="
+        {% if tournament.category == "L" %}
+            background-color: lightpink
+        {% elif tournament.category == "C" %}
+            background-color: lightgreen;
+        {% endif %}"
+      class="p-2"
+>
 {% block content %}
 {% endblock %}
 </body>

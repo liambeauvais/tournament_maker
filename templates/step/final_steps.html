@@ -9,10 +9,18 @@
 {% block content %}
     <div class="row">
         <div class="col-10">
-            <p class="fs-1">Phase finale</p>
-        </div>
+                <div class="row">
+                    <div class="col-5">
+                        <p class="fs-1">Phase finale</p>
+                    </div>
+                    <div class="col-7 my-auto align-center">
+                        <a class="btn btn-danger" href="{% url 'cancel_steps' first_step.tournament.pk 3 %}">ANNULER CETTE
+                            PHASE</a>
+                    </div>
+                </div>
+            </div>
         <div class="col-2 d-flex justify-content-center align-items-center gap-2">
-            <a class="btn btn-primary" href="{% url 'step_pdf' first_step.pk 3 %}" target="_blank">Imprimer les poules</a>
+            <a class="btn btn-primary" href="{% url 'steps_pdf' first_step.pk 3 %}" target="_blank">Imprimer les poules</a>
             {% if steps_are_done %}
                 {% if not tournament.scoreboard %}
                     <a class="btn btn-primary" href="{% url 'create_scoreboard' tournament.pk %}">Créer le
@@ -27,9 +35,9 @@
         </div>
     </div>
     <div class="row p-2">
-        {% for step in steps %}
+        {% for step in steps|dictsort:"rank" %}
             <div class="gap-1">
-                <h2>Finale des rangs {{ forloop.counter }}</h2>
+                <h2>Finale des rangs {{ step.rank }}</h2>
                 <div class="row d-flex justify-content-around gap-2">
                     {% for child_step in step.step_set.all|dictsort:"rank" %}
                         {% for pool in child_step.pools.all %}
@@ -53,12 +61,12 @@
                                         {% for player in pool.players.all %}
                                             <div class="row">
                                                 <div class="col-8">
-                                                    Joueur {{ forloop.counter }}: {{ player.player.last_name }} {{ player.player.first_name }}
-                                                    ({{ player.player.points }} points) id {{ player.pk }}
+                                                    Joueur {{ forloop.counter }} : {{ player.player.last_name }} {{ player.player.first_name }}
+                                                    ({{ player.player.points }} points)
                                                 </div>
-                                                {% if pool.validated %}
+                                                {% if pool.is_validated %}
                                                     <div class="col-4">
-                                                        Rang: {{ player.rank }}, coeff: {{ player.coeff }}
+                                                        Rang: {{ player.rank }}, coeff : {{ player.coeff }}
                                                     </div>
                                                 {% endif %}
                                             </div>
@@ -70,7 +78,7 @@
                                             <th scope="col">#</th>
                                             <th style="width: 100px" scope="col">Joueur 1</th>
                                             <th style="width: 100px" scope="col">Joueur 2</th>
-                                            <th scope="col">Sets</th>
+                                            <th scope="col">Manches</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -89,7 +97,7 @@
                                                                 <div class="col mx-1"
                                                                      style="min-width: 50px; max-width: 50px">
                                                                     <label class="form-label"
-                                                                           for="{{ set.pk }}">Set {{ forloop.counter }}</label>
+                                                                           for="{{ set.pk }}">Manche {{ forloop.counter }}</label>
                                                                     <input class="form-control" id="{{ set.pk }}"
                                                                            type="text"
                                                                            name="{{ set.pk }}"

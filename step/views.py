@@ -1,6 +1,7 @@
 import math
 
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse_lazy
 from django.views.generic import TemplateView
 
 from game.views import value_is_digit
@@ -9,7 +10,9 @@ from pool.models import Pool, PoolPLayer
 from step.functions.scoreboard import create_pool_scoreboard, PlayerForSettle
 from step.functions.step_generation import generate_pools
 from step.models import Step
+from tournament.functions.pdf import get_tournament_steps
 from tournament.models import Tournament
+from tournament.views import TournamentMixin
 
 
 def create_first_step(request, *args, **kwargs):
@@ -87,11 +90,12 @@ def create_final_steps(request, *args, **kwargs):
     return redirect('final_steps', pk=first_step.tournament.pk)
 
 
-class StepView(TemplateView):
+class StepView(TemplateView, TournamentMixin):
     template_name = "step/step_view.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['tournament'] = self.get_tournament(**kwargs)
         first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
         context['title'] = f"{first_step.tournament.date}-{first_step.tournament.get_category_display()}"
         context['step'] = first_step
@@ -99,11 +103,12 @@ class StepView(TemplateView):
         return context
 
 
-class SecondStepsView(TemplateView):
+class SecondStepsView(TemplateView,TournamentMixin):
     template_name = "step/second_steps.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['tournament'] = self.get_tournament(**kwargs)
         first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
         context['title'] = f"{first_step.tournament.date}-{first_step.tournament.get_category_display()}"
 
@@ -116,11 +121,12 @@ class SecondStepsView(TemplateView):
         return context
 
 
-class FinalStepsView(TemplateView):
+class FinalStepsView(TemplateView, TournamentMixin):
     template_name = 'step/final_steps.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['tournament'] = self.get_tournament(**kwargs)
         first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
         context['title'] = f"{first_step.tournament.date}-{first_step.tournament.get_category_display()}"
 
@@ -157,7 +163,6 @@ def validate_pool(request, *args, **kwargs):
         pool_player.coeff = player.coefficient
         pool_player.save()
         count += 1
-
     return redirect(request.META.get('HTTP_REFERER'))
 
 
@@ -170,5 +175,15 @@ def force_pool_validation(request, *args, **kwargs):
             pool_player.rank = value
             pool_player.coeff = 0.0
             pool_player.save()
-
     return redirect(request.META.get('HTTP_REFERER'))
+
+
+def cancel_steps(request, *args, **kwargs):
+    tournament = Tournament.objects.get(pk=kwargs.get("pk"))
+    first_step = Step.objects.filter(tournament=tournament).exclude(last_step__isnull=False).first()
+    step_iteration = kwargs.get('step_iteration')
+    steps = get_tournament_steps(first_step, step_iteration)
+    for step in steps:
+        step.delete()
+
+    return redirect('tournament_detail', tournament.pk)

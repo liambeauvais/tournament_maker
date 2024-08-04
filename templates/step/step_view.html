@@ -12,10 +12,18 @@
     <div class="p-2">
         <div class="row">
             <div class="col-8">
-                <p class="fs-1">Premières poules</p>
+                <div class="row">
+                    <div class="col-5">
+                        <p class="fs-1">Premières poules</p>
+                    </div>
+                    <div class="col-7 my-auto align-center">
+                        <a class="btn btn-danger" href="{% url 'cancel_steps' step.tournament.pk 1 %}">ANNULER CETTE
+                            PHASE</a>
+                    </div>
+                </div>
             </div>
             <div class="col-4 d-flex justify-content-center align-items-center gap-2">
-                <a class="btn btn-primary" href="{% url 'step_pdf' step.pk 1 %}" target="_blank">Imprimer les poules</a>
+                <a class="btn btn-primary" href="{% url 'steps_pdf' step.pk 1 %}" target="_blank">Imprimer les poules</a>
                 {% if step.is_done %}
                     {% if step.step_set.all|length == 0 %}
                         <form class="row" method="post" action="{% url 'create_second_step' step.pk %}">
@@ -56,7 +64,8 @@
                                     <a class="btn btn-primary" href="{% url "validate_pool" step.pk pool.pk %}"
                                        style="font-size: 0.8em">Faire les départages</a>
                                 {% else %}
-                                    <a class="btn btn-primary disabled" style="font-size: 0.8em">Faire les départages</a>
+                                    <a class="btn btn-primary disabled" style="font-size: 0.8em">Faire les
+                                        départages</a>
                                 {% endif %}
                             </div>
                         </div>
@@ -98,7 +107,7 @@
                                 <th scope="col">#</th>
                                 <th style="width: 100px" scope="col">Joueur 1</th>
                                 <th style="width: 100px" scope="col">Joueur 2</th>
-                                <th scope="col">Sets</th>
+                                <th scope="col">Manches</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -115,7 +124,7 @@
                                                 {% for set in game.sets.all %}
                                                     <div class="col mx-1" style="min-width: 50px; max-width: 50px">
                                                         <label class="form-label"
-                                                               for="{{ set.pk }}">Set {{ forloop.counter }}</label>
+                                                               for="{{ set.pk }}">Manche {{ forloop.counter }}</label>
                                                         <input class="form-control" id="{{ set.pk }}" type="text"
                                                                name="{{ set.pk }}"
                                                                value="{{ set.score|default_if_none:"" }}">

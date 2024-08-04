@@ -31,18 +31,21 @@ def get_tournament_steps(step: Step, step_iteration: int):
 def get_steps_pools(steps: list[Step], pools_by_page: int = None, is_last_step: bool = False):
     pool_count = 1
     pools = []
-    step_count = 1
+
     for step in steps:
+        step_count = 1
         for pool in step.pools.all():
+
             if pool.players.count() > 1:
                 pools.append(
                     {
                         "pool": pool,
                         "next_page": pool_count % pools_by_page == 0,
                         "rank": step.last_step.rank if is_last_step else step.rank,
-                        "step_count": pool_count,
+                        "step_count": step_count,
 
                     }
                 )
+                step_count += 1
                 pool_count += 1
     return pools

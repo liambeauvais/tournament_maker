@@ -14,7 +14,7 @@
                 <a class="btn btn-primary" href="{% url 'tournaments' %}">Retour</a>
             </div>
             <div class="col-6 p-2 mx-2">
-                <h1>Détails du Tournoi: {{ tournament.name }}</h1>
+                <h1>Détails du Tournoi : {{ tournament.name }}</h1>
             </div>
             {% if tournament.step_set %}
                 <div class="col-4 p-2 mx-2">
@@ -22,7 +22,7 @@
                         <form class="row" method="post" action="{% url 'create_first_step' tournament.pk %}">
                             {% csrf_token %}
                             <div class="col">
-                                <label for="players">Joueurs par poule :</label>
+                                <label for="players">Joueurs par poule</label>
                                 <select class="form-select" id="players" name="players">
                                     <option value="3">3</option>
                                     <option value="4">4</option>
@@ -32,7 +32,7 @@
                             </div>
                             <div class="col">
                                 <label for="set_number">
-                                    Nombre de sets
+                                    Nombre de manches
                                 </label>
                                 <select class="form-select" id="set_number" name="set_number">
                                     <option value="3">3</option>
