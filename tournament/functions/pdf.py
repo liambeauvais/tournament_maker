@@ -35,14 +35,15 @@ def get_steps_pools(steps: list[Step], pools_by_page: int = None, is_last_step: 
     for step in steps:
         step_count = 1
         for pool in step.pools.all():
-
+            print(pool.players.order_by('-player__points').all())
             if pool.players.count() > 1:
                 pools.append(
                     {
-                        "pool": pool,
+                        "object": pool,
                         "next_page": pool_count % pools_by_page == 0,
                         "rank": step.last_step.rank if is_last_step else step.rank,
                         "step_count": step_count,
+                        "players": pool.players.order_by('-player__points').all(),
 
                     }
                 )

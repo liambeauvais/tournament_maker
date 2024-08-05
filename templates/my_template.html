@@ -32,7 +32,7 @@
 
     <div id="pool-container" class="pool-container">
         <div>
-            {% for player in pool.pool.players.all %}
+            {% for player in pool.players %}
                 <p>
                     Joueur {{ forloop.counter }}: {{ player.player.last_name }} {{ player.player.first_name }}({{ player.player.points }}
                     points)</p>
@@ -42,21 +42,22 @@
         <table style="font-size: 1em">
             <thead>
             <tr>
-                <th id="other" colspan="2">{{ pool.pool.step.tournament.get_category_display }}</th>
-                <th id="other" colspan="{{ pool.pool.step.set_number }}">Poule {{ pool.step_count }}, rang {{ pool.rank }}, TABLE:</th>
-                <th id="winner" colspan="{{ pool.pool.players.all|length }}">Gagnant</th>
+                <th id="other" colspan="2">{{ pool.object.step.tournament.get_category_display }}</th>
+                <th id="other" colspan="{{ pool.object.step.set_number }}">Poule {{ pool.step_count }},
+                    rang {{ pool.rank }}, TABLE: {{ pool.object.table }}</th>
+                <th id="winner" colspan="{{ pool.players.all|length }}">Gagnant</th>
             </tr>
             <tr>
                 <th headers="other">Joueur 1</th>
                 <th headers="other">Joueur 2</th>
-                <th headers="other" colspan="{{ pool.pool.step.set_number }}">Sets</th>
-                {% for player in pool.pool.players.all %}
+                <th headers="other" colspan="{{ pool.object.step.set_number }}">Sets</th>
+                {% for player in pool.players %}
                     <th headers="winner">{{ forloop.counter }}</th>
                 {% endfor %}
             </tr>
             </thead>
             <tbody>
-            {% for game in pool.pool.games.all %}
+            {% for game in pool.object.games.all %}
                 <tr style="text-align: center">
                     <td style="width: 150px; padding: 2px">{{ game.player_one.last_name }} {{ game.player_one.first_name }}</td>
                     <td style="width: 150px; padding: 2px">{{ game.player_two.last_name }} {{ game.player_two.first_name }}</td>
@@ -66,8 +67,14 @@
                     {% endfor %}
 
 
-                    {% for player in pool.pool.players.all %}
-                        <td style="width: 20px"></td>
+                    {% for player in pool.players %}
+                        <td
+                                style="width: 20px;
+                                        {% if player.player.pk == game.player_one.id or player.player.pk == game.player_two.pk %}
+                                        {% else %}
+                                            background-color: black;
+                                        {% endif %}"
+                        ></td>
                     {% endfor %}
 
                 </tr>
@@ -75,11 +82,11 @@
 
             </tbody>
         </table>
-    <hr>
+        <hr>
     </div>
     {% if pool.next_page %}
         <pdf:nextpage>
-    {% endif %} 
+    {% endif %}
 {% endfor %}
 
 

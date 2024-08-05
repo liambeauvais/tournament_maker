@@ -23,7 +23,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('tournament.urls')),
     path('games/', include('game.urls')),
-    path('steps/', include('step.urls'))
+    path('steps/', include('step.urls')),
+    path('pools/', include('pool.urls')),
 ]
 
 
