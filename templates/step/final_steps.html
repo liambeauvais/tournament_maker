@@ -9,25 +9,26 @@
 {% block content %}
     <div class="row">
         <div class="col-10">
-                <div class="row">
-                    <div class="col-5">
-                        <p class="fs-1">Phase finale</p>
-                    </div>
-                    <div class="col-7 my-auto align-center">
-                        <a class="btn btn-danger" href="{% url 'cancel_steps' first_step.tournament.pk 3 %}">ANNULER CETTE
-                            PHASE</a>
-                    </div>
+            <div class="row">
+                <div class="col-5">
+                    <p class="fs-1">Phase finale</p>
+                </div>
+                <div class="col-7 my-auto align-center">
+                    <a class="btn btn-danger" href="{% url 'cancel_steps' first_step.tournament.pk 3 %}">ANNULER CETTE
+                        PHASE</a>
                 </div>
             </div>
+        </div>
         <div class="col-2 d-flex justify-content-center align-items-center gap-2">
-            <a class="btn btn-primary" href="{% url 'steps_pdf' first_step.pk 3 %}" target="_blank">Imprimer les poules</a>
+            <a class="btn btn-primary" href="{% url 'steps_pdf' first_step.pk 3 %}" target="_blank">Imprimer les
+                poules</a>
             {% if steps_are_done %}
                 {% if not tournament.scoreboard %}
                     <a class="btn btn-primary" href="{% url 'create_scoreboard' tournament.pk %}">Créer le
                         récapitulatif</a>
                 {% else %}
                     <a class="btn btn-primary" href="{% url 'scoreboard' tournament.pk %}">Voir le
-                    récapitulatif</a>
+                        récapitulatif</a>
                 {% endif %}
             {% else %}
                 <a class="btn btn-primary disabled">Créer le récapitulatif</a>
@@ -45,23 +46,65 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col-9">
-                                            {% load custom_filters %}
-                                        <h3>Rencontre {% next_item %}{% if pool.players.all|length > 1 %}-{% next_item %}{% endif %} </h3>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <button class="btn btn-link" data-toggle="collapse"
+                                                            data-target="#collapse{{ pool.pk }}"
+                                                            aria-expanded="true" aria-controls="collapseOne">
+                                                        {% load custom_filters %}
+                                                        Rencontre {% next_item %}{% if pool.players.all|length > 1 %}-
+                                                        {% next_item %}{% endif %}
+                                                    </button>
+                                                </div>
+                                                <div class="col-4">
+                                                    <form method="post" action="{% url 'modify_table' pool.pk %}"
+                                                          class="form-inline p-2 border rounded">
+                                                        {% csrf_token %}
+                                                        <div class="row">
+                                                            <div class="form-group col-8">
+                                                                <label for="table" class="sr-only">
+                                                                    Table:
+                                                                </label>
+                                                                <input
+                                                                        class="form-control"
+                                                                        style="width: 40px; height: 24px;"
+                                                                        type="text"
+                                                                        name="table"
+                                                                        value="
+                                                                                {% if pool.table %}{{ pool.table }}{% endif %}"
+                                                                        id="table"
+                                                                >
+                                                            </div>
+                                                            <button
+                                                                    class="btn col-4"
+                                                                    type="submit"
+                                                                    style="width: 40px;height: 40px; padding: 0; font-size: 20px">
+                                                                ✔
+                                                            </button>
+                                                        </div>
+
+                                                    </form>
+                                                </div>
+                                            </div>
+
                                         </div>
                                         <div class="col-3">
                                             {% if pool.is_done %}
-                                    <a class="btn btn-primary" href="{% url "validate_pool" step.pk pool.pk %}"
-                                       style="font-size: 0.8em">Valider le match</a>
-                                {% else %}
-                                    <a class="btn btn-primary disabled" style="font-size: 0.8em">Valider le match</a>
-                                {% endif %}
+                                                <a class="btn btn-primary"
+                                                   href="{% url "validate_pool" step.pk pool.pk %}"
+                                                   style="font-size: 0.8em">Valider le match</a>
+                                            {% else %}
+                                                <a class="btn btn-primary disabled" style="font-size: 0.8em">Valider le
+                                                    match</a>
+                                            {% endif %}
                                         </div>
                                     </div>
                                     <div class="row">
                                         {% for player in pool.players.all %}
                                             <div class="row">
                                                 <div class="col-8">
-                                                    Joueur {{ forloop.counter }} : {{ player.player.last_name }} {{ player.player.first_name }}
+                                                    Joueur {{ forloop.counter }}
+                                                    : {{ player.player.last_name }} {{ player.player.first_name }}
                                                     ({{ player.player.points }} points)
                                                 </div>
                                                 {% if pool.is_validated %}
