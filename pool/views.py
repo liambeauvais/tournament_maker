@@ -11,8 +11,8 @@ def modify_table(request, *args, **kwargs):
     pool = Pool.objects.get(pk=kwargs['pk'])
     table = request.POST.get('table')
 
-    if value_is_digit(table):
-        pool.table = int(table)
-        pool.save()
+
+    pool.table = table
+    pool.save()
 
     return HttpResponseRedirect(request.META.get('HTTP_REFERER'))

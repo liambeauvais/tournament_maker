@@ -70,7 +70,7 @@
             </div>
             <div class="row d-flex justify-content-around gap-3">
                 {% for pool in step.pools.all %}
-                    <div class="card" style="min-width:650px; max-width: 650px" id={{ pool.pk }}>
+                    <div class="card" style="min-width:650px; max-width: 650px" id=accordion{{ pool.pk }}>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-9">
@@ -92,7 +92,7 @@
                                                             Table:
                                                         </label>
                                                         <input
-                                                                class="form-control" style="width: 40px; height: 24px;"
+                                                                class="form-control" style="width: 80px; height: 24px;"
                                                                 type="text"
                                                                 name="table"
                                                                 value="{% if pool.table %}{{ pool.table }}{% endif %}"
@@ -152,7 +152,14 @@
                                     </form>
                                 </div>
                             </div>
-                            <table class="table table-striped" style="font-size: 0.7em">
+                            <table class="table table-striped collapse {% if pool.pk == pool_id_to_show %}
+                            	show
+                            {% endif %} " 
+                                   style="font-size: 0.7em"
+                                   id="collapse{{ pool.pk }}"
+                                   aria-labelledby="headingOne"
+                                   data-parent="#accordion{{ pool.pk }}"
+                            >
                                 <thead>
                                 <tr>
                                     <th scope="col">#</th>
