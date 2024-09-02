@@ -101,7 +101,6 @@ class StepView(TemplateView, TournamentMixin):
         context['step'] = first_step
         context['number_of_sets'] = [i + 1 for i in range(first_step.set_number)]
 
-        print(self.request.path)
         pool_id_to_show = self.request.GET.get('show', 0)
         context['pool_id_to_show'] = int(pool_id_to_show)
         return context
@@ -123,7 +122,6 @@ class SecondStepsView(TemplateView,TournamentMixin):
         context['steps_are_done'] = all(step.is_done() for step in first_step.step_set.all())
         context['not_created'] = all(step.step_set.count() == 0 for step in first_step.step_set.all())
 
-        print(self.request.path)
         pool_id_to_show = self.request.GET.get('show', 0)
         context['pool_id_to_show'] = int(pool_id_to_show)
         return context

@@ -29,7 +29,6 @@ def update_game(request, *args, **kwargs):
             game_set.save()
 
     referer_url = request.META.get('HTTP_REFERER', '/')
-    print(referer_url)
     if 'show' in referer_url:
         referer_url = referer_url.split('=')
         referer_url = f"{referer_url[0]}={game_set.game.pool.id}#accordion{game_set.game.pool.id}"
