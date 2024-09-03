@@ -77,32 +77,35 @@ def generate_pool_matches(pools: list[Pool]):
             pool.games.add(game)
             pool.save()
 
+            sets = []
             for i in range(number_of_sets):
-                set = Set.objects.create(
+                sets.append(Set(
                     game_id=game.pk,
-                    number=i + 1
-                )
-                set.save()
+                    number=i+1
+                ))
+            Set.objects.bulk_create(sets)
 
 
-def generate_pools(numbers_of_pools: int, players: QuerySet[Player], step_id: int, players_by_pool: int = None, set_number:int=None):
-    for i in range(numbers_of_pools):
-        pool = Pool.objects.create(
-            step_id=step_id
-        )
-        pool.save()
-    pools = Pool.objects.filter(step_id=step_id).all()
+def generate_pools(numbers_of_pools: int, players: QuerySet[Player], step_id: int, players_by_pool: int = None):
+    pools = [
+        Pool(step_id=step_id)
+        for _ in range(numbers_of_pools)
+    ]
+    pools = Pool.objects.bulk_create(pools)
+
     count = 0
     players_sorted = players.order_by("-points")
+    pool_players = []
     for i in range(players_by_pool):
         for pool in pools:
             if len(players) > count:
-                pool_player = PoolPLayer.objects.create(
-                    pool_id=pool.pk,
-                    player_id=players_sorted[count].pk
+                pool_players.append(
+                    PoolPLayer(
+                        pool_id=pool.pk,
+                        player_id=players_sorted[count].pk
+                    )
                 )
-                pool_player.save()
                 count += 1
         pools = pools[::-1]
-
+    PoolPLayer.objects.bulk_create(pool_players)
     generate_pool_matches(pools)

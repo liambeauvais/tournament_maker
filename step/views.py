@@ -106,7 +106,7 @@ class StepView(TemplateView, TournamentMixin):
         return context
 
 
-class SecondStepsView(TemplateView,TournamentMixin):
+class SecondStepsView(TemplateView, TournamentMixin):
     template_name = "step/second_steps.html"
 
     def get_context_data(self, **kwargs):
