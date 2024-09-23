@@ -8,16 +8,15 @@ from player.models import Player
 from pool.models import Pool, PoolPLayer
 
 
-def generate_round_robin_games(players: QuerySet[PoolPLayer], tournament_id: Type[int]):
-    num_players = len(players)
+def generate_round_robin_games(pool_players: QuerySet[PoolPLayer], tournament_id: Type[int]):
+    num_players = len(pool_players)
     mock_player = Player.objects.get(last_name="Test")
 
-    players_id = [player.player_id for player in players]
+    players = [pool_player.player for pool_player in pool_players]
     if num_players % 2 != 0:
-        players_id.append(mock_player.pk)
+        players.append(mock_player)
         num_players += 1
 
-    players = Player.objects.filter(pk__in=players_id).order_by('-points').all()
     players_indexed = [
         {'index': index, 'player': players[index]}
         for index in range(num_players)
@@ -25,7 +24,6 @@ def generate_round_robin_games(players: QuerySet[PoolPLayer], tournament_id: Typ
     # Fix the first player
     fixed_player = players_indexed[0]
     rotating_players = players_indexed[1:]
-
     games: list[Game] = []
 
     for round_num in range(num_players - 1):
@@ -62,7 +60,6 @@ def generate_round_robin_games(players: QuerySet[PoolPLayer], tournament_id: Typ
     if len(games_without_mock) == 3:
         first_game = games_without_mock.pop(0)
         games_without_mock.append(first_game)
-
     return games_without_mock
 
 
@@ -81,7 +78,7 @@ def generate_pool_matches(pools: list[Pool]):
             for i in range(number_of_sets):
                 sets.append(Set(
                     game_id=game.pk,
-                    number=i+1
+                    number=i + 1
                 ))
             Set.objects.bulk_create(sets)
 
