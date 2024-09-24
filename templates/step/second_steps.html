@@ -10,51 +10,7 @@
 
 {% block content %}
     <div class="p-2">
-        <div class="row">
-            <div class="col-8">
-                <div class="row">
-                    <div class="col-5">
-                        <p class="fs-1">Seconde phase</p>
-                    </div>
-                    <div class="col-7 my-auto align-center">
-                        <a class="btn btn-danger" href="{% url 'cancel_steps' firs_step.tournament.pk 2 %}">ANNULER
-                            CETTE
-                            PHASE</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-4 d-flex justify-content-center align-items-center gap-2">
-                <a class="btn btn-primary" href="{% url 'steps_pdf' firs_step.pk 2 %}" target="_blank">Imprimer les
-                    poules</a>
-                {% if steps_are_done %}
-                    {% if not_created %}
-                        <form class="row" method="post" action="{% url 'create_final_steps' firs_step.pk %}">
-                            {% csrf_token %}
-                            <div class="col">
-                                <label for="set_number">
-                                    Nombre de Manches
-                                </label>
-                                <select class="form-select" id="set_number" name="set_number">
-                                    <option value="3">3</option>
-                                    <option value="5">5</option>
-                                </select>
-                            </div>
-                            <div class="col">
-                                <button type="submit" class="btn btn-primary">Créer le tableau
-                                    final
-                                </button>
-                            </div>
-                        </form>
-                    {% else %}
-                        <a class="btn btn-primary" href="{% url 'final_steps' firs_step.tournament.pk %}">Accéder au
-                            tableau
-                            final</a>
-                    {% endif %}
-                {% else %}
-                    <a class="btn btn-primary disabled">Passer au tableau final</a>
-                {% endif %}
-            </div>
-        </div>
+        {% include "step/step_header.html" %}
         {% for step in steps|dictsort:"rank" %}
             <hr>
             <div class="row mb-4">

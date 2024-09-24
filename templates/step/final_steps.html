@@ -7,36 +7,10 @@
 
 {# Display django.contrib.messages as Bootstrap alerts #}
 {% block content %}
-    <div class="row">
-        <div class="col-10">
-            <div class="row">
-                <div class="col-5">
-                    <p class="fs-1">Phase finale</p>
-                </div>
-                <div class="col-7 my-auto align-center">
-                    <a class="btn btn-danger" href="{% url 'cancel_steps' first_step.tournament.pk 3 %}">ANNULER CETTE
-                        PHASE</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-2 d-flex justify-content-center align-items-center gap-2">
-            <a class="btn btn-primary" href="{% url 'steps_pdf' first_step.pk 3 %}" target="_blank">Imprimer les
-                poules</a>
-            {% if steps_are_done %}
-                {% if not tournament.scoreboard %}
-                    <a class="btn btn-primary" href="{% url 'create_scoreboard' tournament.pk %}">Créer le
-                        récapitulatif</a>
-                {% else %}
-                    <a class="btn btn-primary" href="{% url 'scoreboard' tournament.pk %}">Voir le
-                        récapitulatif</a>
-                {% endif %}
-            {% else %}
-                <a class="btn btn-primary disabled">Créer le récapitulatif</a>
-            {% endif %}
-        </div>
-    </div>
-    <div class="row p-2">
+    <div class="p-2">
+        {% include "step/step_header.html" %}
         {% for step in steps|dictsort:"rank" %}
+            <hr>
             <div class="gap-1">
                 <h2>Finale des rangs {{ step.rank }}</h2>
                 <div class="row d-flex justify-content-around gap-2">
@@ -70,7 +44,8 @@
                                                                         style="width: 80px; height: 24px;"
                                                                         type="text"
                                                                         name="table"
-                                                                        value="{% if pool.table %}{{ pool.table }}{% endif %}"
+                                                                        value="
+                                                                                {% if pool.table %}{{ pool.table }}{% endif %}"
                                                                         id="table"
                                                                 >
                                                             </div>
@@ -165,8 +140,6 @@
 
                 </div>
             </div>
-            <hr class="border border-primary border-3 opacity-75">
         {% endfor %}
-
     </div>
 {% endblock %}

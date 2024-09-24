@@ -98,6 +98,13 @@ class StepView(TemplateView, TournamentMixin):
         first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
         context['title'] = f"{first_step.tournament.date}-{first_step.tournament.get_category_display()}"
         context['step'] = first_step
+        context['first_step'] = first_step
+        context['step_iteration'] = 1
+        context['step_title'] = "Premières poules"
+        context['next_steps_title'] = "deuxièmes poules"
+        context['next_step_create_url'] = "create_second_step"
+        context['next_step_url'] = 'second_steps'
+        context['no_next_steps'] = first_step.step_set.count() == 0
         context['number_of_sets'] = [i + 1 for i in range(first_step.set_number)]
 
         pool_id_to_show = self.request.GET.get('show', 0)
@@ -116,10 +123,16 @@ class SecondStepsView(TemplateView, TournamentMixin):
 
         second_steps = first_step.step_set.all()
         context["steps"] = second_steps
-        context["firs_step"] = first_step
+        context["first_step"] = first_step
         context['number_of_sets'] = [i + 1 for i in range(context["steps"][0].set_number)]
         context['steps_are_done'] = all(step.is_done() for step in first_step.step_set.all())
-        context['not_created'] = all(step.step_set.count() == 0 for step in first_step.step_set.all())
+
+        context['step_iteration'] = 2
+        context['step_title'] = "Deuxièmes poules"
+        context['next_steps_title'] = "tableau final"
+        context['next_step_create_url'] = "create_final_steps"
+        context['next_step_url'] = "final_steps"
+        context['no_next_steps'] = all(step.step_set.count() == 0 for step in first_step.step_set.all())
 
         pool_id_to_show = self.request.GET.get('show', 0)
         context['pool_id_to_show'] = int(pool_id_to_show)
@@ -155,6 +168,18 @@ class FinalStepsView(TemplateView, TournamentMixin):
             for second_step in first_step.step_set.all()
             for step in second_step.step_set.all()
         )
+
+        context['step_iteration'] = 3
+        context['step_title'] = "Phase finale"
+        context['next_steps_title'] = "tableau final"
+        context['next_step_create_url'] = "create_scoreboard"
+        context['next_step_url'] = "scoreboard"
+        context['no_next_steps'] = all(
+            step.step_set.count() == 0
+            for second_step in first_step.step_set.all()
+            for step in second_step.step_set.all()
+        )
+
         return context
 
 

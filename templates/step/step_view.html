@@ -9,48 +9,7 @@
 
 {% block content %}
     <div class="p-2">
-        <div class="row">
-            <div class="col-8">
-                <div class="row">
-                    <div class="col-5">
-                        <p class="fs-1">Premières poules</p>
-                    </div>
-                    <div class="col-7 my-auto align-center">
-                        <a class="btn btn-danger" href="{% url 'cancel_steps' step.tournament.pk 1 %}">ANNULER CETTE
-                            PHASE</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-4 d-flex justify-content-center align-items-center gap-2">
-                <a class="btn btn-primary" href="{% url 'steps_pdf' step.pk 1 %}" target="_blank">Imprimer les
-                    poules</a>
-                {% if step.is_done %}
-                    {% if step.step_set.all|length == 0 %}
-                        <form class="row" method="post" action="{% url 'create_second_step' step.pk %}">
-                            {% csrf_token %}
-                            <div class="col">
-                                <label for="set_number">
-                                    Nombre de sets
-                                </label>
-                                <select class="form-select" id="set_number" name="set_number">
-                                    <option value="3">3</option>
-                                    <option value="5">5</option>
-                                </select>
-                            </div>
-                            <div class="col">
-                                <button type="submit" class="btn btn-primary">Créer les deuxièmes poules</button>
-                            </div>
-                        </form>
-                    {% else %}
-                        <a class="btn btn-primary" href="{% url 'second_steps' step.tournament.pk %}">Passer aux
-                            deuxièmes
-                            poules</a>
-                    {% endif %}
-                {% else %}
-                    <a class="btn btn-primary disabled">Passer aux deuxièmes poules</a>
-                {% endif %}
-            </div>
-        </div>
+        {% include "step/step_header.html" %}
         <hr>
         <div class="row d-flex justify-content-around gap-3">
             {% for pool in step.pools.all %}
