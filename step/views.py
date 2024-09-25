@@ -90,36 +90,61 @@ def create_final_steps(request, *args, **kwargs):
 
 
 class StepView(TemplateView, TournamentMixin):
-    template_name = "step/step_view.html"
+    step_iteration = None
+    step_title = None
+    next_steps_title = None
+    next_step_create_url = None
+    next_step_url = None
+    no_next_steps = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['tournament'] = self.get_tournament(**kwargs)
-        first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
+        first_step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
         context['title'] = f"{first_step.tournament.date}-{first_step.tournament.get_category_display()}"
-        context['step'] = first_step
         context['first_step'] = first_step
-        context['step_iteration'] = 1
-        context['step_title'] = "Premières poules"
-        context['next_steps_title'] = "deuxièmes poules"
-        context['next_step_create_url'] = "create_second_step"
-        context['next_step_url'] = 'second_steps'
-        context['no_next_steps'] = first_step.step_set.count() == 0
+        context['step_iteration'] = self.step_iteration
+        context['step_title'] = self.step_title
+        context['next_steps_title'] = self.next_steps_title
+        context['next_step_create_url'] = self.next_step_create_url
+        context['next_step_url'] = self.next_step_url
+        context['no_next_steps'] = self.no_next_steps
         context['number_of_sets'] = [i + 1 for i in range(first_step.set_number)]
+
+        return context
+
+
+class FirstStepView(StepView):
+    template_name = "step/step_view.html"
+    step_iteration = 1
+    step_title = "Premières poules"
+    next_steps_title = "deuxièmes poules"
+    next_step_create_url = "create_second_step"
+    next_step_url = "second_steps"
+    no_next_steps = None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        first_step: Step = context['first_step']
+        context['step'] = first_step
+        self.no_next_steps = first_step.step_set.count() == 0
 
         pool_id_to_show = self.request.GET.get('show', 0)
         context['pool_id_to_show'] = int(pool_id_to_show)
         return context
 
 
-class SecondStepsView(TemplateView, TournamentMixin):
+class SecondStepsView(StepView):
     template_name = "step/second_steps.html"
+    step_iteration = 2
+    step_title = "Deuxièmes poules"
+    next_steps_title = "tableau final"
+    next_step_create_url = "create_final_steps"
+    next_step_url = "final_steps"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['tournament'] = self.get_tournament(**kwargs)
-        first_step: Step = Step.objects.filter(tournament_id=kwargs.get("pk")).exclude(last_step__isnull=False).first()
-        context['title'] = f"{first_step.tournament.date}-{first_step.tournament.get_category_display()}"
+        first_step: Step = context['first_step']
 
         second_steps = first_step.step_set.all()
         context["steps"] = second_steps
@@ -127,20 +152,23 @@ class SecondStepsView(TemplateView, TournamentMixin):
         context['number_of_sets'] = [i + 1 for i in range(context["steps"][0].set_number)]
         context['steps_are_done'] = all(step.is_done() for step in first_step.step_set.all())
 
-        context['step_iteration'] = 2
-        context['step_title'] = "Deuxièmes poules"
-        context['next_steps_title'] = "tableau final"
         context['next_step_create_url'] = "create_final_steps"
         context['next_step_url'] = "final_steps"
-        context['no_next_steps'] = all(step.step_set.count() == 0 for step in first_step.step_set.all())
+        self.no_next_steps = all(step.step_set.count() == 0 for step in first_step.step_set.all())
 
         pool_id_to_show = self.request.GET.get('show', 0)
         context['pool_id_to_show'] = int(pool_id_to_show)
         return context
 
 
-class FinalStepsView(TemplateView, TournamentMixin):
+class FinalStepsView(StepView):
     template_name = 'step/final_steps.html'
+
+    step_iteration = 3
+    step_title = "Phase finale"
+    next_steps_title = "tableau final"
+    next_step_create_url = "create_scoreboard"
+    next_step_url = "scoreboard"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -169,12 +197,7 @@ class FinalStepsView(TemplateView, TournamentMixin):
             for step in second_step.step_set.all()
         )
 
-        context['step_iteration'] = 3
-        context['step_title'] = "Phase finale"
-        context['next_steps_title'] = "tableau final"
-        context['next_step_create_url'] = "create_scoreboard"
-        context['next_step_url'] = "scoreboard"
-        context['no_next_steps'] = all(
+        self.no_next_steps = all(
             step.step_set.count() == 0
             for second_step in first_step.step_set.all()
             for step in second_step.step_set.all()
