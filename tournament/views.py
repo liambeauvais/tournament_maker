@@ -80,11 +80,8 @@ class TournamentDetailView(DetailView):
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
+        form = PlayerForm(request.POST)
 
-        if self.object.category == "C":
-            form = PlayerForm(request.POST)
-        else:
-            form = CasuPlayerForm(request.POST)
         if form.is_valid():
             player = form.save()
             self.object.players.add(player)

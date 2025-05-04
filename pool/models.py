@@ -7,7 +7,7 @@ from step.models import Step
 # Create your models here.
 class Pool(models.Model):
     step = models.ForeignKey(Step, on_delete=models.CASCADE, related_name="pools")
-    table = models.IntegerField(null=True)
+    table = models.TextField(null=True)
 
     def is_done(self):
         return all(

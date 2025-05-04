@@ -1,0 +1,49 @@
+<div class="row step-header">
+    <div class="col-7">
+        <div class="row">
+            <div class="col-5">
+                <p class="fs-1">{{ step_title }}</p>
+            </div>
+            <div class="col-7 my-auto align-center">
+                <a class="btn btn-danger" href="{% url 'cancel_steps' first_step.tournament.pk step_iteration %}">ANNULER
+                    CETTE
+                    PHASE</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-5 d-flex justify-content-center align-items-center gap-2">
+        <div class="row">
+            <div class="col-4">
+                <a class="btn btn-primary" href="{% url 'steps_pdf' first_step.pk step_iteration %}" target="_blank">Imprimer
+                    les
+                    poules</a>
+            </div>
+            <div class="col-8">
+                {% if step.is_done or steps_are_done %}
+                    {% if no_next_steps %}
+                        <form class="row border rounded border-dark p-1" method="post" action="{% url next_step_create_url first_step.pk %}">
+                            {% csrf_token %}
+                            <div class="col-6">
+                                <label for="set_number">
+                                    Nombre de manches
+                                </label>
+                                <select class="form-select" id="set_number" name="set_number">
+                                    <option value="3">3</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </div>
+                            <div class="col-6 my-auto">
+                                <button type="submit" class="btn btn-primary">Créer {{ next_steps_title }}</button>
+                            </div>
+                        </form>
+                    {% else %}
+                        <a class="btn btn-primary" href="{% url next_step_url first_step.tournament.pk %}">Passer aux
+                            {{ next_steps_title }}</a>
+                    {% endif %}
+                {% else %}
+                    <a class="btn btn-primary disabled">Passer au(x) {{ next_steps_title }}</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
