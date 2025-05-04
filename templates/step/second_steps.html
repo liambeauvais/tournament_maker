@@ -17,18 +17,18 @@
                         <p class="fs-1">Seconde phase</p>
                     </div>
                     <div class="col-7 my-auto align-center">
-                        <a class="btn btn-danger" href="{% url 'cancel_steps' firs_step.tournament.pk 2 %}">ANNULER
+                        <a class="btn btn-danger" href="{% url 'cancel_steps' first_step.tournament.pk 2 %}">ANNULER
                             CETTE
                             PHASE</a>
                     </div>
                 </div>
             </div>
             <div class="col-4 d-flex justify-content-center align-items-center gap-2">
-                <a class="btn btn-primary" href="{% url 'steps_pdf' firs_step.pk 2 %}" target="_blank">Imprimer les
+                <a class="btn btn-primary" href="{% url 'steps_pdf' first_step.pk 2 %}" target="_blank">Imprimer les
                     poules</a>
                 {% if steps_are_done %}
                     {% if not_created %}
-                        <form class="row" method="post" action="{% url 'create_final_steps' firs_step.pk %}">
+                        <form class="row" method="post" action="{% url 'create_final_steps' first_step.pk %}">
                             {% csrf_token %}
                             <div class="col">
                                 <label for="set_number">
@@ -46,7 +46,7 @@
                             </div>
                         </form>
                     {% else %}
-                        <a class="btn btn-primary" href="{% url 'final_steps' firs_step.tournament.pk %}">Accéder au
+                        <a class="btn btn-primary" href="{% url 'final_steps' first_step.tournament.pk %}">Accéder au
                             tableau
                             final</a>
                     {% endif %}
@@ -70,130 +70,7 @@
             </div>
             <div class="row d-flex justify-content-around gap-3">
                 {% for pool in step.pools.all %}
-                    <div class="card" style="min-width:650px; max-width: 650px" id={{ pool.pk }}>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-9">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <button class="btn btn-link" data-toggle="collapse"
-                                                    data-target="#collapse{{ pool.pk }}"
-                                                    aria-expanded="true" aria-controls="collapseOne">
-                                                Poule {{ forloop.counter }} : id {{ pool.pk }}
-                                            </button>
-                                        </div>
-                                        <div class="col-4">
-                                            <form method="post" action="{% url 'modify_table' pool.pk %}"
-                                                  class="form-inline p-2 border rounded">
-                                                {% csrf_token %}
-                                                <div class="row">
-                                                    <div class="form-group col-8">
-                                                        <label for="table" class="sr-only">
-                                                            Table:
-                                                        </label>
-                                                        <input
-                                                                class="form-control" style="width: 40px; height: 24px;"
-                                                                type="text"
-                                                                name="table"
-                                                                value="{% if pool.table %}{{ pool.table }}{% endif %}"
-                                                                id="table"
-                                                        >
-                                                    </div>
-                                                    <button
-                                                            class="btn col-4"
-                                                            type="submit"
-                                                            style="width: 40px;height: 40px; padding: 0; font-size: 20px">
-                                                        ✔
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-3">
-                                    {% if pool.is_done %}
-                                        <a class="btn btn-primary" href="{% url "validate_pool" step.pk pool.pk %}"
-                                           style="font-size: 0.8em">Faire les départages</a>
-                                    {% else %}
-                                        <a class="btn btn-primary disabled" style="font-size: 0.8em">Faire les
-                                            départages</a>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-7">
-                                    {% for player in pool.players.all %}
-                                        <div class="row">
-                                            Joueur {{ forloop.counter }}: {{ player.player.last_name }} {{ player.player.first_name }}
-                                            ({{ player.player.points }} points)
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                                <div class="col-5">
-                                    <form class="row border rounded" method="post"
-                                          action="{% url 'force_pool_validation' step.pk pool.pk %}">
-                                        {% csrf_token %}
-                                        <button
-                                                class="btn"
-                                                type="submit"
-                                                style="width: 40px;height: 40px; padding: 0; font-size: 20px; position: absolute; top: 70px; right:20px"
-                                        >✔
-                                        </button>
-                                        {% for player in pool.players.all %}
-                                            <div class="row">
-                                                <span style="width: 65px">Rang:</span><label
-                                                    style="width: 40px; margin-right: 5px" for="{{ player.pk }}"><input
-                                                    class="form-control" style="width: 40px; height: 24px;" type="text"
-                                                    name="{{ player.pk }}" value="{{ player.rank }}"
-                                                    id="{{ player.pk }}"></label><span
-                                                    style="width: 100px"> Coeff: {{ player.coeff }}</span>
-                                            </div>
-                                        {% endfor %}
-                                    </form>
-                                </div>
-                            </div>
-                            <table class="table table-striped" style="font-size: 0.7em">
-                                <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th style="width: 100px" scope="col">Joueur 1</th>
-                                    <th style="width: 100px" scope="col">Joueur 2</th>
-                                    <th scope="col">Manches</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for game in pool.games.all %}
-                                    <tr>
-                                        <th scope="col">{{ forloop.counter }}</th>
-                                        <td>{{ game.player_one.last_name }} {{ game.player_one.first_name }}</td>
-                                        <td>{{ game.player_two.last_name }} {{ game.player_two.first_name }}</td>
-                                        <td>
-                                            <div class="row d-flex justify-content-between">
-                                                <form method="post" action="{% url "update_game" game.pk %}"
-                                                      class="col d-flex justify-content-start" style="width: 300px">
-                                                    {% csrf_token %}
-                                                    {% for set in game.sets.all %}
-                                                        <div class="col mx-1" style="min-width: 50px; max-width: 50px">
-                                                            <label class="form-label"
-                                                                   for="{{ set.pk }}">Manche {{ forloop.counter }}</label>
-                                                            <input class="form-control" id="{{ set.pk }}" type="text"
-                                                                   name="{{ set.pk }}"
-                                                                   value="{{ set.score|default_if_none:"" }}">
-                                                        </div>
-                                                    {% endfor %}
-                                                    <button class="btn" type="submit"
-                                                            style="width: 40px;height: 40px; padding: 0; font-size: 20px">
-                                                        ✔
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                    {% include "step/components/pool.html" %}
                 {% endfor %}
             </div>
         {% endfor %}

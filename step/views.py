@@ -42,8 +42,8 @@ def create_second_step(request, *args, **kwargs):
     first_step = get_object_or_404(Step, id=kwargs.get('pk'))
     set_number = int(request.POST.get('set_number'))
     ranks = {}
-    for pool in first_step.pools.all():
-        for pool_player in pool.players.all():
+    for pool in first_step.pools.select_related("players"):
+        for pool_player in pool.players.select_related("players"):
             if pool_player.rank in ranks:
                 ranks[pool_player.rank].append(pool_player.player.pk)
             else:
@@ -114,7 +114,7 @@ class SecondStepsView(TemplateView,TournamentMixin):
 
         second_steps = first_step.step_set.all()
         context["steps"] = second_steps
-        context["firs_step"] = first_step
+        context["first_step"] = first_step
         context['number_of_sets'] = [i + 1 for i in range(context["steps"][0].set_number)]
         context['steps_are_done'] = all(step.is_done() for step in first_step.step_set.all())
         context['not_created'] = all(step.step_set.count() == 0 for step in first_step.step_set.all())
