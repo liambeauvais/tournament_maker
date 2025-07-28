@@ -21,7 +21,7 @@
                                             Table:
                                         </label>
                                         <input
-                                                class="form-control" style="width: 40px; height: 24px;"
+                                                class="form-control" style="width: 50px; height: 24px;"
                                                 type="text"
                                                 name="table"
                                                 value="{% if pool.table %}{{ pool.table }}{% endif %}"
@@ -58,9 +58,34 @@
                 <div class="col-7">
                     {% for player in pool.players.all %}
                         <div class="row">
-                            Joueur {{ forloop.counter }}: {{ player.player.last_name }} {{ player.player.first_name }}
-                            ({{ player.player.points }} points)
+                            <div class="col-1">
+                                {#                                <form method="post" action="{% url 'remove_player_from_pool' %}">#}
+                                {#                                    {% csrf_token %}#}
+                                {#                                    <input name="player_id" value={{ player.pk }} hidden>#}
+                                {#                                    <button#}
+                                {#                                            class="btn"#}
+                                {#                                            type="submit"#}
+                                {#                                            style="width: 20px;height: 20px; padding: 0; font-size: 20px"#}
+                                {#                                    >🧨#}
+                                {#                                    </button>#}
+                                {#                                </form>#}
+                                <button
+                                        type="button"
+                                        class="btn"
+                                        style="width: 20px;height: 20px; padding: 0; font-size: 20px"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#confirmRemoveModal"
+                                        data-player-id="{{ player.pk }}"
+                                >
+                                    🧨
+                                </button>
+                            </div>
+                            <div class="col-11">
+                                Joueur {{ forloop.counter }}: {{ player.player.last_name }} {{ player.player.first_name }}
+                                ({{ player.player.points }} points)
+                            </div>
                         </div>
+                        <hr/>
                     {% endfor %}
                 </div>
                 <div class="col-5">
@@ -133,3 +158,36 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="confirmRemoveModal" tabindex="-1" aria-labelledby="confirmRemoveLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" action="{% url 'remove_player_from_pool' %}">
+                {% csrf_token %}
+                <input type="hidden" name="player_id" id="modal-player-id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmRemoveLabel">Confirmer la suppression</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    Es-tu sûr de vouloir retirer ce joueur ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-secondary">Confirmer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const confirmModal = document.getElementById('confirmRemoveModal');
+    confirmModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const playerId = button.getAttribute('data-player-id');
+        const hiddenInput = confirmModal.querySelector('#modal-player-id');
+        hiddenInput.value = playerId;
+    });
+});
+</script>

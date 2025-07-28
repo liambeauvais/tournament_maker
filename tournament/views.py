@@ -145,7 +145,7 @@ def render_step_matches(request, *args, **kwargs):
     ranks = {
     }
 
-    for pool in step.pools.select_related("players"):
+    for pool in step.pools.prefetch_related("players"):
         for pool_player in pool.players.all():
             if pool_player.rank in ranks:
                 ranks[pool_player.rank].append(pool_player.player.pk)

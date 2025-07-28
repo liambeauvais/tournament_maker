@@ -41,8 +41,9 @@ def create_second_step(request, *args, **kwargs):
     first_step = get_object_or_404(Step, id=kwargs.get('pk'))
     set_number = int(request.POST.get('set_number'))
     ranks = {}
-    for pool in first_step.pools.select_related("players"):
-        for pool_player in pool.players.select_related("players"):
+    pools = first_step.pools.prefetch_related("players")
+    for pool in pools:
+        for pool_player in pool.players.all():
             if pool_player.rank in ranks:
                 ranks[pool_player.rank].append(pool_player.player.pk)
             else:
@@ -121,14 +122,12 @@ class FirstStepView(StepView):
     next_steps_title = "deuxièmes poules"
     next_step_create_url = "create_second_step"
     next_step_url = "second_steps"
-    no_next_steps = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         first_step: Step = context['first_step']
         context['step'] = first_step
-        self.no_next_steps = first_step.step_set.count() == 0
-
+        context["no_next_steps"] = first_step.step_set.count() == 0
         pool_id_to_show = self.request.GET.get('show', 0)
         context['pool_id_to_show'] = int(pool_id_to_show)
         return context
