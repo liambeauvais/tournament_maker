@@ -10,6 +10,7 @@
                                     aria-expanded="true" aria-controls="collapseOne">
                                 Poule {{ forloop.counter }} : id {{ pool.pk }}
                             </button>
+                            <a href="{% url 'add_player' pool.pk %}" class="btn btn-primary" target="_blank">Ajouter un joueur</a>
                         </div>
                         <div class="col-4">
                             <form method="post" action="{% url 'modify_table' pool.pk %}"
@@ -59,16 +60,6 @@
                     {% for player in pool.players.all %}
                         <div class="row">
                             <div class="col-1">
-                                {#                                <form method="post" action="{% url 'remove_player_from_pool' %}">#}
-                                {#                                    {% csrf_token %}#}
-                                {#                                    <input name="player_id" value={{ player.pk }} hidden>#}
-                                {#                                    <button#}
-                                {#                                            class="btn"#}
-                                {#                                            type="submit"#}
-                                {#                                            style="width: 20px;height: 20px; padding: 0; font-size: 20px"#}
-                                {#                                    >🧨#}
-                                {#                                    </button>#}
-                                {#                                </form>#}
                                 <button
                                         type="button"
                                         class="btn"
@@ -181,13 +172,13 @@
     </div>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const confirmModal = document.getElementById('confirmRemoveModal');
-    confirmModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget;
-        const playerId = button.getAttribute('data-player-id');
-        const hiddenInput = confirmModal.querySelector('#modal-player-id');
-        hiddenInput.value = playerId;
+    document.addEventListener('DOMContentLoaded', function () {
+        const confirmModal = document.getElementById('confirmRemoveModal');
+        confirmModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const playerId = button.getAttribute('data-player-id');
+            const hiddenInput = confirmModal.querySelector('#modal-player-id');
+            hiddenInput.value = playerId;
+        });
     });
-});
 </script>

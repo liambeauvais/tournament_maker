@@ -83,7 +83,7 @@ def generate_pool_matches(pools: list[Pool]):
             Set.objects.bulk_create(sets)
 
 
-def generate_pools(numbers_of_pools: int, players: QuerySet[Player], step_id: int, players_by_pool: int = None):
+def generate_pools(numbers_of_pools: int, players: QuerySet[Player], step_id: int, players_by_pool):
     pools = [
         Pool(step_id=step_id)
         for _ in range(numbers_of_pools)

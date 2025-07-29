@@ -1,0 +1,61 @@
+<!-- tournament_view.html -->
+{% extends "base/base.html" %}
+{% load bootstrap5 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+{# Display django.contrib.messages as Bootstrap alerts #}
+
+{% block content %}
+    {% if player_added %}
+        <p>OK</p>
+    {% else %}
+    {% for player in players %}
+        <button
+                                        type="button"
+                                        class="btn btn-primary m-1 w-25"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#confirmRemoveModal"
+                                        data-player-id="{{ player.pk }}"
+                                >
+                                    AJOUTER {{ player.last_name }} {{ player.first_name }}
+                                </button>
+    {% endfor %}
+    
+    <div class="modal fade" id="confirmRemoveModal" tabindex="-1" aria-labelledby="confirmRemoveLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form method="post" action="{% url 'add_player' pool.pk %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="player_id" id="modal-player-id">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmRemoveLabel">Confirmer l'ajout d'un joueur</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        Es-tu sûr de vouloir ajouter ce joueur ?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Annuler</button>
+                        <button type="submit" class="btn btn-secondary">Confirmer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const confirmModal = document.getElementById('confirmRemoveModal');
+            confirmModal.addEventListener('show.bs.modal', function (event) {
+                const button = event.relatedTarget;
+                const playerId = button.getAttribute('data-player-id');
+                const hiddenInput = confirmModal.querySelector('#modal-player-id');
+                hiddenInput.value = playerId;
+            });
+        });
+    </script>
+    {% endif %}
+{% endblock %}
