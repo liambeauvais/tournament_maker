@@ -58,12 +58,12 @@
             <div class="row">
                 <div class="col-7">
                     {% for player in pool.players.all %}
-                        <div class="row">
-                            <div class="col-1">
+                        <div class="row border-bottom pb-1 pt-1">
+                            <div class="col-1 ">
                                 <button
                                         type="button"
                                         class="btn"
-                                        style="width: 20px;height: 20px; padding: 0; font-size: 20px"
+                                        style="width: 24px;height: 24px; padding: 0"
                                         data-bs-toggle="modal"
                                         data-bs-target="#confirmRemoveModal"
                                         data-player-id="{{ player.pk }}"
@@ -76,7 +76,6 @@
                                 ({{ player.player.points }} points)
                             </div>
                         </div>
-                        <hr/>
                     {% endfor %}
                 </div>
                 <div class="col-5">
