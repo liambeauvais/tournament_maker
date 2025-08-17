@@ -178,3 +178,13 @@ def render_step_matches(request, *args, **kwargs):
         step.delete()
 
     return pdf
+
+
+def render_player_list(request, *args, **kwargs):
+    tournament = Tournament.objects.get(pk=kwargs.get('pk'))
+    players = list(tournament.players.all())
+    padded_players = players + [None] * (48 - len(players))
+
+
+    pdf = render_to_pdf('registration_list.html', {'tournament': tournament, 'players': padded_players})
+    return pdf

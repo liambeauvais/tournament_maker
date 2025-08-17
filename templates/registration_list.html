@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF Report</title>
+</head>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid black;
+        padding: 2px;
+        text-align: center;
+        font-size: 10px;
+        height: 20.5px;
+    }
+
+</style>
+<body>
+<table>
+    <thead>
+    <tr>
+        <th colspan="4">{{ tournament.get_category_display }}</th>
+    </tr>
+    <tr>
+        <th>#</th>
+        <th>Nom</th>
+        <th>Prénom</th>
+        <th>Payé</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for player in players %}
+            <tr>
+            <td style="width: 40px">{{ forloop.counter }}</td>
+            <td style="width: 600px">{% if player %}{{ player.last_name }}{% endif %}</td>
+            <td style="width: 600px">{% if player %}{{ player.first_name }}{% endif %}</td>
+            <td style="width: 80px">    </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>
