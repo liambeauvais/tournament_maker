@@ -23,12 +23,13 @@
 <table>
     <thead>
     <tr>
-        <th colspan="4">{{ tournament.get_category_display }}</th>
+        <th colspan="5">{{ tournament.get_category_display }}</th>
     </tr>
     <tr>
         <th>#</th>
         <th>Nom</th>
         <th>Prénom</th>
+        <th>Points</th>
         <th>Payé</th>
     </tr>
     </thead>
@@ -36,8 +37,9 @@
         {% for player in players %}
             <tr>
             <td style="width: 40px">{{ forloop.counter }}</td>
-            <td style="width: 600px">{% if player %}{{ player.last_name }}{% endif %}</td>
-            <td style="width: 600px">{% if player %}{{ player.first_name }}{% endif %}</td>
+            <td style="width: 700px">{% if player %}{{ player.last_name }}{% endif %}</td>
+            <td style="width: 350px">{% if player %}{{ player.first_name }}{% endif %}</td>
+            <td style="width: 100px">{% if player %}{{ player.points }}{% endif %}</td>
             <td style="width: 80px">    </td>
             </tr>
         {% endfor %}
